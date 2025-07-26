@@ -182,11 +182,7 @@ public:
         glBindVertexArray(0);
     }
 
-    void launchCudaKernel(Sphere* devSpheres,
-                          int numSpheres,
-                          Camera camera,
-                          int raysPerPixel,
-                          int maxBounceLimit)
+    void launchCudaKernel(Sphere* devSpheres, int numSpheres, Camera camera)
     {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
@@ -195,14 +191,7 @@ public:
         size_t size;
         cudaGraphicsMapResources(1, &cudaPBO, 0);
         cudaGraphicsResourceGetMappedPointer((void**)&devPtr, &size, cudaPBO);
-        renderKernel <<<grid, block>>> (devPtr,
-                                        width,
-                                        height,
-                                        devSpheres,
-                                        numSpheres,
-                                        camera,
-                                        raysPerPixel,
-                                        maxBounceLimit);
+        renderKernel <<<grid, block>>> (devPtr, width, height, devSpheres, numSpheres, camera);
     }
 
     void processKeyboardInput(Camera& camera)
@@ -269,7 +258,7 @@ public:
         }
     }
 
-    void renderTexturedQuad(int& raysPerPixel, int& maxBounceLimit, Camera& camera)
+    void renderTexturedQuad(Camera& camera)
     {
         cudaGraphicsUnmapResources(1, &cudaPBO, 0);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
@@ -286,8 +275,8 @@ public:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::Begin("Debugger");
-        ImGui::SliderInt("Rays Per Pixel", &raysPerPixel, 0, 15);
-        ImGui::SliderInt("Max Bounce Limit", &maxBounceLimit, 0, 15);
+        ImGui::SliderInt("Rays Per Pixel", &camera.raysPerPixel, 0, 15);
+        ImGui::SliderInt("Max Bounce Limit", &camera.maxBounceLimit, 0, 15);
         ImGui::Text("Camera Position x:%.2f, y:%.2f, z:%.2f", camera.position.x, camera.position.y, camera.position.z);
         ImGui::Text("Camera Direction x:%.2f, y:%.2f, z:%.2f", camera.direction.x, camera.direction.y, camera.direction.z);
         ImGui::Text("Camera Up x:%.2f, y:%.2f, z:%.2f", camera.up.x, camera.up.y, camera.up.z);

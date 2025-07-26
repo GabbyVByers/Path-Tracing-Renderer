@@ -25,14 +25,12 @@ int main()
 
     // Camera
     Camera camera;
+    camera.raysPerPixel = 2;
+    camera.maxBounceLimit = 2;
     camera.position  = { 11.3f, 8.0f, -10.0f };
     camera.direction = { -0.5f, -0.5f, 0.7f };
     camera.depth     = 2.0f;
     fixCamera(camera);
-
-    // Controls
-    int raysPerPixel = 2;
-    int maxBounceLimit = 2;
 
     // bobbing spheres
     float theta = 0.0f;
@@ -51,15 +49,11 @@ int main()
         cudaMemcpy(devSpheres, hostSpheres, sizeof(Sphere) * numSpheres, cudaMemcpyHostToDevice);
 
 
-        renderer.launchCudaKernel(devSpheres,
-                                  numSpheres,
-                                  camera,
-                                  raysPerPixel,
-                                  maxBounceLimit);
+        renderer.launchCudaKernel(devSpheres, numSpheres, camera);
 
         renderer.processKeyboardInput(camera);
         renderer.processMouseInput(camera);
-        renderer.renderTexturedQuad(raysPerPixel, maxBounceLimit, camera);
+        renderer.renderTexturedQuad(camera);
     }
 
     return 0;

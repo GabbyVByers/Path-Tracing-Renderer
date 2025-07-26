@@ -9,6 +9,9 @@ struct Camera
     vec3 up;
     vec3 right;
     float depth;
+
+    int raysPerPixel;
+    int maxBounceLimit;
 };
 
 inline void fixCamera(Camera& camera)

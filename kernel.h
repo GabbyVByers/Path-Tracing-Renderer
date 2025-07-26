@@ -99,9 +99,7 @@ __global__ inline void renderKernel(uchar4* pixels,
                                     int height,
                                     Sphere* devSpheres,
                                     int numSpheres,
-                                    Camera camera,
-                                    int raysPerPixel,
-                                    int maxBounceLimit)
+                                    Camera camera)
 {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -116,11 +114,11 @@ __global__ inline void renderKernel(uchar4* pixels,
     vec3 incomingLight = { 0.0f, 0.0f, 0.0f };
     Ray ray = { camera.position, (camera.direction * camera.depth) + (camera.up * v) + (camera.right * u) };
     normalize(ray.direction);
-    for (int i = 0; i < raysPerPixel; i++)
+    for (int i = 0; i < camera.raysPerPixel; i++)
     {
-        incomingLight += calculateIncomingLight(ray, devSpheres, numSpheres, maxBounceLimit, randomState);
+        incomingLight += calculateIncomingLight(ray, devSpheres, numSpheres, camera.maxBounceLimit, randomState);
     }
-    incomingLight /= raysPerPixel;
+    incomingLight /= camera.raysPerPixel;
 
     uint8 r = incomingLight.x * 255.0f;
     uint8 g = incomingLight.y * 255.0f;
