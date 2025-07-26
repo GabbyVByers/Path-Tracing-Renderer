@@ -25,12 +25,3 @@ struct Ray
     vec3 direction;
 };
 
-struct Camera
-{
-    vec3 position;
-    vec3 direction;
-    vec3 up;
-    vec3 right;
-    float depth;
-};
-

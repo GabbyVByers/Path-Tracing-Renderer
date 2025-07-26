@@ -3,6 +3,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "vec3.h"
+#include "camera.h"
 #include "quaternions.h"
 #include "dataStructures.h"
 #include "random.h"

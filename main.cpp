@@ -27,12 +27,8 @@ int main()
     Camera camera;
     camera.position  = { 11.3f, 8.0f, -10.0f };
     camera.direction = { -0.5f, -0.5f, 0.7f };
-
-
-    normalize(camera.direction);
-    camera.up        = { 0.0f, 1.0f, 0.0f };
     camera.depth     = 2.0f;
-    camera.right = camera.direction * camera.up;
+    fixCamera(camera);
 
     // Controls
     int raysPerPixel = 2;
