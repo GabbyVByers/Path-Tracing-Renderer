@@ -16,6 +16,9 @@
     <Filter Include="Header Files\ImGui">
       <UniqueIdentifier>{2e250eab-3ffd-45ea-886d-7bd837fefdc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ReadMe">
+      <UniqueIdentifier>{ead03716-f588-4ed3-b4a1-6979b5ea2cd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c">
@@ -97,5 +100,10 @@
     <CudaCompile Include="DataStructures.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md">
+      <Filter>ReadMe</Filter>
+    </None>
   </ItemGroup>
 </Project>
