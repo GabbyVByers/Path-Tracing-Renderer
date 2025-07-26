@@ -25,7 +25,7 @@ int main()
 
     // Camera
     Camera camera;
-    camera.raysPerPixel = 2;
+    camera.raysPerPixel = 1;
     camera.maxBounceLimit = 2;
     camera.position  = { 11.3f, 8.0f, -10.0f };
     camera.direction = { -0.5f, -0.5f, 0.7f };
@@ -39,7 +39,7 @@ int main()
     {
 
         // bobbing spheres
-        theta += 0.2;
+        //theta += 0.2;
         for (int i = 1; i < 5; i++)
         {
             hostSpheres[i].position.y = 2.0f * sin(theta + (float)i) + 1.0f;
@@ -59,4 +59,3 @@ int main()
     return 0;
 }
 
- 
