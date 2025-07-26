@@ -259,14 +259,13 @@ public:
         if (mouseRelX != 0.0f)
         {
             camera.direction = rotate(camera.direction, up, magicNum * -mouseRelX);
-            camera.up = rotate(camera.up, up, magicNum * -mouseRelX);
-            camera.right = camera.direction * camera.up;
+            fixCamera(camera);
         }
 
         if (mouseRelY != 0.0f)
         {
             camera.direction = rotate(camera.direction, camera.right, magicNum * -mouseRelY);
-            camera.up = rotate(camera.up, camera.right, magicNum * -mouseRelY);
+            fixCamera(camera);
         }
     }
 
