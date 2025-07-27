@@ -8,16 +8,15 @@ int main()
     InteropRenderer renderer(1920, 1080, "CUDA OpenGL Path Tracer", false);
 
     // Spheres
-    int numSpheres = 6;
+    int numSpheres = 5;
     Sphere* hostSpheres = nullptr;
     hostSpheres = new Sphere[numSpheres];
 
-    hostSpheres[0] = { false, {  0.0f, -90.0f,   0.0f },  90.0f, randomVec3(0.3f, 1.0f) };
-    hostSpheres[1] = { false, { -8.0f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
-    hostSpheres[2] = { false, { -2.6f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
-    hostSpheres[3] = { false, {  2.6f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
-    hostSpheres[4] = { false, {  8.0f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
-    hostSpheres[5] = { true,  {  0.0f,  30.0f, 150.0f }, 100.0f, randomVec3(0.3f, 1.0f) };
+    hostSpheres[0] = { {  0.0f, -90.0f,   0.0f },  90.0f, randomVec3(0.3f, 1.0f) };
+    hostSpheres[1] = { { -8.0f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
+    hostSpheres[2] = { { -2.6f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
+    hostSpheres[3] = { {  2.6f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
+    hostSpheres[4] = { {  8.0f,   1.0f,   0.0f },   2.0f, randomVec3(0.3f, 1.0f) };
 
     Sphere* devSpheres = nullptr; 
     cudaMalloc((void**)&devSpheres, sizeof(Sphere) * numSpheres);
@@ -39,7 +38,7 @@ int main()
     {
 
         // bobbing spheres
-        //theta += 0.2;
+        theta += 0.2;
         for (int i = 1; i < 5; i++)
         {
             hostSpheres[i].position.y = 2.0f * sin(theta + (float)i) + 1.0f;

@@ -96,7 +96,7 @@ public:
         ImGuiIO& io = ImGui::GetIO();
         float scale = 2.0f;
         io.FontGlobalScale = scale;
-        io.IniFilename = nullptr;
+        //io.IniFilename = nullptr;
         ImGui::GetStyle().ScaleAllSizes(scale);
         ImGui::StyleColorsDark();
         ImGui_ImplGlfw_InitForOpenGL(window, true);

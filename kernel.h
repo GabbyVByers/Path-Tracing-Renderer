@@ -39,7 +39,6 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, const Sphere* d
         if (t < closest_t)
         {
             closest_t = t;
-            info.didHitLightSource = devSpheres[i].isLightSource;
             info.hitColor = devSpheres[i].color;
             info.hitLocation = ray.origin + (ray.direction * t);
             info.hitNormal = info.hitLocation - devSpheres[i].position;
@@ -52,16 +51,29 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, const Sphere* d
 
 __device__ inline vec3 skyColor(const vec3& direction)
 {
-    vec3 lightDirection = { 0.57735f, 0.57735f, 0.57735f };
-    float intensity = (dot(lightDirection, direction) + 1.0f) / 2.0f;
-    return { intensity, intensity, intensity };
+    //vec3 lightDirection = { 1.0f, 1.0f, 1.0f };
+    //normalize(lightDirection);
+    //
+    //vec3 skyBlue = { 0.325f, 0.667f, 0.9f };
+    //vec3 skyWhite = { 0.9f, 0.9f, 0.9f };
+    //vec3 groundColor = { 0.57f, 0.529f, 0.57f };
+    //
+    //if (dot(lightDirection, direction) > 0.997f)
+    //{
+    //    return skyWhite;
+    //}
+    //
+    //if (direction.y < 0.0f)
+    //{
+    //    return groundColor;
+    //}
+    //
+    //return skyBlue;
+
+    return { 1.0f, 1.0f, 1.0f };
 }
 
-__device__ inline vec3 calculateIncomingLight(Ray ray,
-                                              const Sphere* devSpheres,
-                                              const int& numSpheres,
-                                              const int& maxBounceLimit,
-                                              uint32& randomState)
+__device__ inline vec3 calculateIncomingLight(Ray ray, const Sphere* devSpheres, const int& numSpheres, const int& maxBounceLimit, uint32& randomState)
 {
     vec3 rayColor = { 1.0f, 1.0f, 1.0f };
     vec3 incomingLight = { 0.0f, 0.0f, 0.0f };
@@ -70,20 +82,20 @@ __device__ inline vec3 calculateIncomingLight(Ray ray,
     {
         HitInfo info = raySpheresIntersection(ray, devSpheres, numSpheres);
 
-        if (!info.didHit)
-            break;
-        
-        if (info.didHitLightSource)
-        {
-            incomingLight = multiply(rayColor, info.hitColor);
-            break;
-        }
-
         //if (!info.didHit)
+        //    break;
+        //
+        //if (info.didHitLightSource)
         //{
-        //    incomingLight = multiply(rayColor, skyColor(ray.direction));
+        //    incomingLight = multiply(rayColor, info.hitColor);
         //    break;
         //}
+
+        if (!info.didHit)
+        {
+            incomingLight = multiply(rayColor, skyColor(ray.direction));
+            break;
+        }
 
         rayColor *= info.hitColor;
 
@@ -94,12 +106,7 @@ __device__ inline vec3 calculateIncomingLight(Ray ray,
     return incomingLight;
 }
 
-__global__ inline void renderKernel(uchar4* pixels,
-                                    int width,
-                                    int height,
-                                    Sphere* devSpheres,
-                                    int numSpheres,
-                                    Camera camera)
+__global__ inline void renderKernel(uchar4* pixels, int width, int height, Sphere* devSpheres, int numSpheres, Camera camera)
 {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;

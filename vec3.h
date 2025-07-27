@@ -89,6 +89,6 @@ __host__ __device__ inline void normalize(vec3& vec)
 
 __host__ __device__ inline vec3 multiply(const vec3& a, const vec3& b)
 {
-	return { a.x * a.x, a.y * a.y, a.z * a.z };
+	return { a.x * b.x, a.y * b.y, a.z * b.z };
 }
 
