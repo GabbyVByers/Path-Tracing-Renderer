@@ -62,3 +62,14 @@ __host__ __device__ inline vec3 randomHemisphereDirection(const vec3& normal, ui
     return direction;
 }
 
+__host__ __device__ inline vec3 randomDirection(uint32& state)
+{
+    float rx = randomFloatNormalDistribution(state);
+    float ry = randomFloatNormalDistribution(state);
+    float rz = randomFloatNormalDistribution(state);
+
+    vec3 direction = { rx, ry, rz };
+    //normalize(direction);
+
+    return direction;
+}
