@@ -73,3 +73,4 @@ __host__ __device__ inline vec3 randomDirection(uint32& state)
 
     return direction;
 }
+

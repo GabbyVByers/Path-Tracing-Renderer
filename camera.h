@@ -11,7 +11,6 @@ struct Camera
     float depth;
 
     int raysPerPixel;
-    int maxBounceLimit;
 };
 
 inline void fixCamera(Camera& camera)

@@ -276,7 +276,6 @@ public:
         ImGui::NewFrame();
         ImGui::Begin("Debugger");
         ImGui::SliderInt("Rays Per Pixel", &camera.raysPerPixel, 0, 15);
-        ImGui::SliderInt("Max Bounce Limit", &camera.maxBounceLimit, 0, 15);
         ImGui::Text("Camera Position x:%.2f, y:%.2f, z:%.2f", camera.position.x, camera.position.y, camera.position.z);
         ImGui::Text("Camera Direction x:%.2f, y:%.2f, z:%.2f", camera.direction.x, camera.direction.y, camera.direction.z);
         ImGui::Text("Camera Up x:%.2f, y:%.2f, z:%.2f", camera.up.x, camera.up.y, camera.up.z);
