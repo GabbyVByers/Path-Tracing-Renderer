@@ -11,6 +11,7 @@ struct Camera
     float depth;
 
     int raysPerPixel;
+    vec3 lightDirection;
 };
 
 inline void fixCamera(Camera& camera)

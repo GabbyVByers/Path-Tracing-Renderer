@@ -49,38 +49,37 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, const Sphere* d
     return info;
 }
 
-__device__ inline vec3 skyColor(const vec3& direction)
+__device__ inline vec3 skyColor(const vec3& direction, const vec3& lightDirection)
 {
-    vec3 lightDirection = { 1.0f, 1.0f, 1.0f };
-    normalize(lightDirection);
+    vec3 skyWhite    = rgb(255, 255, 255);
+    vec3 skyBlue     = rgb(57, 162, 237);
+    vec3 groundColor = rgb(143, 136, 130);
 
-    if (dot(lightDirection, direction) > 0.9f)
-    {
-        return { 1.0f, 1.0f, 1.0f };
-    }
+    if (direction.y < 0.0f)
+        return groundColor;
+
+    if (dot(lightDirection, direction) > 0.997f)
+        return skyWhite;
     
-    return { 0.25f, 0.25f, 0.5f };
+    return skyBlue;
 }
 
-__device__ inline vec3 calculateIncomingLight(Ray ray, const Sphere* devSpheres, const int& numSpheres, uint32& randomState)
+__device__ inline vec3 calculateIncomingLight(Ray ray, const Sphere* devSpheres, const int& numSpheres, uint32& randomState, const Camera& camera)
 {
-    vec3 lightDirection = { 1.0f, 1.0f, 1.0f };
-    normalize(lightDirection);
-    
     vec3 rayColor = { 1.0f, 1.0f, 1.0f };
 
     HitInfo info = raySpheresIntersection(ray, devSpheres, numSpheres);
 
     if (!info.didHit)
     {
-        return skyColor(ray.direction);
+        return skyColor(ray.direction, camera.lightDirection);
     }
 
     rayColor *= info.hitColor;
 
 
     ray.origin = info.hitLocation + (info.hitNormal * 0.001f);
-    ray.direction = lightDirection + (randomDirection(randomState) * 0.15f);
+    ray.direction = camera.lightDirection + (randomDirection(randomState) * 0.15f);
 
     HitInfo shadowInfo = raySpheresIntersection(ray, devSpheres, numSpheres);
 
@@ -109,7 +108,7 @@ __global__ inline void renderKernel(uchar4* pixels, int width, int height, Spher
     normalize(ray.direction);
     for (int i = 0; i < camera.raysPerPixel; i++)
     {
-        incomingLight += calculateIncomingLight(ray, devSpheres, numSpheres, randomState);
+        incomingLight += calculateIncomingLight(ray, devSpheres, numSpheres, randomState, camera);
     }
     incomingLight /= camera.raysPerPixel;
 

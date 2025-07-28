@@ -92,3 +92,7 @@ __host__ __device__ inline vec3 multiply(const vec3& a, const vec3& b)
 	return { a.x * b.x, a.y * b.y, a.z * b.z };
 }
 
+__host__ __device__ inline vec3 rgb(const unsigned char& r, const unsigned char& g, const unsigned char& b)
+{
+	return { (r / 255.0f), (g / 255.0f), (b / 255.0f) };
+}

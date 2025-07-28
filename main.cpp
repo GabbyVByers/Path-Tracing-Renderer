@@ -23,15 +23,16 @@ int main()
     // Camera
     Camera camera;
     camera.raysPerPixel = 1;
+    camera.lightDirection = { 1.0f, 1.0f, 1.0f };
+    normalize(camera.lightDirection);
     camera.position  = { 11.3f, 8.0f, -10.0f };
     camera.direction = { -0.5f, -0.5f, 0.7f };
-    camera.depth     = 2.0f;
+    camera.depth     = 1.5f;
     fixCamera(camera);
 
     while (!glfwWindowShouldClose(renderer.window))
     {
         renderer.launchCudaKernel(devSpheres, numSpheres, camera);
-
         renderer.processKeyboardInput(camera);
         renderer.processMouseInput(camera);
         renderer.renderTexturedQuad(camera);
