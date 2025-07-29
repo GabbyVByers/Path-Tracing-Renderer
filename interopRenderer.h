@@ -306,5 +306,10 @@ public:
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    int screenSize()
+    {
+        return width * height;
+    }
 };
 

@@ -28,14 +28,25 @@ int main()
     camera.position  = { 11.3f, 8.0f, -10.0f };
     camera.direction = { -0.5f, -0.5f, 0.7f };
     camera.depth     = 1.5f;
-    camera.uniqeFrameHash = 42069;
     camera.bufferSize = 0;
     camera.bufferLimit = 100;
     fixCamera(camera);
 
+    unsigned int* hostHashArray = nullptr;
+    hostHashArray = new unsigned int[renderer.screenSize()];
+
+    for (int i = 0; i < renderer.screenSize(); i++)
+    {
+        unsigned int hash = i;
+        hash_uint32(hash);
+        hostHashArray[i] = hash;
+    }
+
+    cudaMalloc((void**)&camera.deviceHashArray, sizeof(unsigned int) * renderer.screenSize());
+    cudaMemcpy(camera.deviceHashArray, hostHashArray, sizeof(unsigned int) * renderer.screenSize(), cudaMemcpyHostToDevice);
+
     while (!glfwWindowShouldClose(renderer.window))
     {
-        hash_uint32(camera.uniqeFrameHash);
         renderer.launchCudaKernel(devSpheres, numSpheres, camera);
         renderer.processKeyboardMouseInput(camera);
         renderer.renderTexturedQuad(camera);

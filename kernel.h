@@ -96,12 +96,7 @@ __global__ inline void renderKernel(uchar4* pixels, int width, int height, Spher
     if (x >= width || y >= height) return;
     int idx = y * width + x;
 
-    uint32 randomState = hash_combine(idx, camera.uniqeFrameHash);
-
-    hash_uint32(randomState);
-    hash_uint32(randomState);
-    hash_uint32(randomState);
-    hash_uint32(randomState);
+    uint32& randomState = camera.deviceHashArray[idx];
 
     float u = ((x / (float)width) * 2.0f - 1.0f) * (width / (float)height);
     float v = (y / (float)height) * 2.0f - 1.0f;
@@ -131,9 +126,9 @@ __global__ inline void renderKernel(uchar4* pixels, int width, int height, Spher
     unsigned char curr_g = pixels[idx].y;
     unsigned char curr_b = pixels[idx].z;
     
-    unsigned char average_r = ((float)curr_r * camera.bufferSize + (float)new_r) / ((float)camera.bufferSize + 1);
-    unsigned char average_g = ((float)curr_g * camera.bufferSize + (float)new_g) / ((float)camera.bufferSize + 1);
-    unsigned char average_b = ((float)curr_b * camera.bufferSize + (float)new_b) / ((float)camera.bufferSize + 1);
+    unsigned char average_r = ((float)curr_r * camera.bufferSize + (float)new_r) / ((float)camera.bufferSize + 1.0f);
+    unsigned char average_g = ((float)curr_g * camera.bufferSize + (float)new_g) / ((float)camera.bufferSize + 1.0f);
+    unsigned char average_b = ((float)curr_b * camera.bufferSize + (float)new_b) / ((float)camera.bufferSize + 1.0f);
     
     pixels[idx] = make_uchar4(average_r, average_g, average_b, 255);
 

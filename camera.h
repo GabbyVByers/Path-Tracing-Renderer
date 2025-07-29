@@ -14,7 +14,7 @@ struct Camera
     int raysPerPixel;
     int bufferSize;
     int bufferLimit;
-    unsigned int uniqeFrameHash;
+    unsigned int* deviceHashArray;
 };
 
 inline void fixCamera(Camera& camera)
