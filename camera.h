@@ -15,6 +15,7 @@ struct Camera
     int bufferSize;
     int bufferLimit;
     unsigned int* deviceHashArray;
+    vec3* deviceTrueFrameBuffer;
 };
 
 inline void fixCamera(Camera& camera)

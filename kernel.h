@@ -110,27 +110,41 @@ __global__ inline void renderKernel(uchar4* pixels, int width, int height, Spher
     }
     incomingLight /= camera.raysPerPixel;
 
+    if (camera.bufferSize > camera.bufferLimit)
+        return;
+
+    vec3 new_color = incomingLight;
+    vec3 curr_color = camera.deviceTrueFrameBuffer[idx];
+    vec3 average_color = (curr_color * (float)camera.bufferSize + new_color) / ((float)camera.bufferSize + 1.0f);
+
+    camera.deviceTrueFrameBuffer[idx] = average_color;
+
+    unsigned char r = average_color.x * 255.0f;
+    unsigned char g = average_color.y * 255.0f;
+    unsigned char b = average_color.z * 255.0f;
+    pixels[idx] = make_uchar4(r, g, b, 255);
+
     //unsigned char r = incomingLight.x * 255.0f;
     //unsigned char g = incomingLight.y * 255.0f;
     //unsigned char b = incomingLight.z * 255.0f;
     //pixels[idx] = make_uchar4(r, g, b, 255);
 
-    if (camera.bufferSize > camera.bufferLimit)
-        return;
-    
-    unsigned char new_r = incomingLight.x * 255.0f;
-    unsigned char new_g = incomingLight.y * 255.0f;
-    unsigned char new_b = incomingLight.z * 255.0f;
-    
-    unsigned char curr_r = pixels[idx].x;
-    unsigned char curr_g = pixels[idx].y;
-    unsigned char curr_b = pixels[idx].z;
-    
-    unsigned char average_r = ((float)curr_r * camera.bufferSize + (float)new_r) / ((float)camera.bufferSize + 1.0f);
-    unsigned char average_g = ((float)curr_g * camera.bufferSize + (float)new_g) / ((float)camera.bufferSize + 1.0f);
-    unsigned char average_b = ((float)curr_b * camera.bufferSize + (float)new_b) / ((float)camera.bufferSize + 1.0f);
-    
-    pixels[idx] = make_uchar4(average_r, average_g, average_b, 255);
+    //if (camera.bufferSize > camera.bufferLimit)
+    //    return;
+    //
+    //unsigned char new_r = incomingLight.x * 255.0f;
+    //unsigned char new_g = incomingLight.y * 255.0f;
+    //unsigned char new_b = incomingLight.z * 255.0f;
+    //
+    //unsigned char curr_r = pixels[idx].x;
+    //unsigned char curr_g = pixels[idx].y;
+    //unsigned char curr_b = pixels[idx].z;
+    //
+    //unsigned char average_r = ((float)curr_r * camera.bufferSize + (float)new_r) / ((float)camera.bufferSize + 1.0f);
+    //unsigned char average_g = ((float)curr_g * camera.bufferSize + (float)new_g) / ((float)camera.bufferSize + 1.0f);
+    //unsigned char average_b = ((float)curr_b * camera.bufferSize + (float)new_b) / ((float)camera.bufferSize + 1.0f);
+    //
+    //pixels[idx] = make_uchar4(average_r, average_g, average_b, 255);
 
     return;
 }

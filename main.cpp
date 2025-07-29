@@ -34,16 +34,16 @@ int main()
 
     unsigned int* hostHashArray = nullptr;
     hostHashArray = new unsigned int[renderer.screenSize()];
-
     for (int i = 0; i < renderer.screenSize(); i++)
     {
         unsigned int hash = i;
         hash_uint32(hash);
         hostHashArray[i] = hash;
     }
-
     cudaMalloc((void**)&camera.deviceHashArray, sizeof(unsigned int) * renderer.screenSize());
     cudaMemcpy(camera.deviceHashArray, hostHashArray, sizeof(unsigned int) * renderer.screenSize(), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**)&camera.deviceTrueFrameBuffer, sizeof(vec3) * renderer.screenSize());
 
     while (!glfwWindowShouldClose(renderer.window))
     {
