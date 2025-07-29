@@ -8,10 +8,13 @@ struct Camera
     vec3 direction;
     vec3 up;
     vec3 right;
-    float depth;
-
-    int raysPerPixel;
     vec3 lightDirection;
+
+    float depth;
+    int raysPerPixel;
+    int frameOffset;
+    int bufferSize;
+    bool redrawScene;
 };
 
 inline void fixCamera(Camera& camera)

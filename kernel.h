@@ -9,8 +9,6 @@
 #include "random.h"
 #include <cfloat>
 
-using uint8 = unsigned char;
-
 __device__ inline HitInfo raySpheresIntersection(const Ray& ray, const Sphere* devSpheres, const int& numSpheres)
 {
     HitInfo info = { false };
@@ -98,7 +96,7 @@ __global__ inline void renderKernel(uchar4* pixels, int width, int height, Spher
     if (x >= width || y >= height) return;
 
     int idx = y * width + x;
-    uint32 randomState = idx;
+    uint32 randomState = idx * camera.frameOffset;
 
     float u = ((x / (float)width) * 2.0f - 1.0f) * (width / (float)height);
     float v = (y / (float)height) * 2.0f - 1.0f;
@@ -112,11 +110,26 @@ __global__ inline void renderKernel(uchar4* pixels, int width, int height, Spher
     }
     incomingLight /= camera.raysPerPixel;
 
-    uint8 r = incomingLight.x * 255.0f;
-    uint8 g = incomingLight.y * 255.0f;
-    uint8 b = incomingLight.z * 255.0f;
+    unsigned char new_r = incomingLight.x * 255.0f;
+    unsigned char new_g = incomingLight.y * 255.0f;
+    unsigned char new_b = incomingLight.z * 255.0f;
 
-    pixels[idx] = make_uchar4(r, g, b, 255);
+    if (camera.redrawScene)
+    {
+        pixels[idx] = make_uchar4(new_r, new_g, new_b, 255);
+        return;
+    }
+
+    unsigned char curr_r = pixels[idx].x;
+    unsigned char curr_g = pixels[idx].y;
+    unsigned char curr_b = pixels[idx].z;
+
+    unsigned char average_r = ((float)curr_r * camera.bufferSize + (float)new_r) / ((float)camera.bufferSize + 1);
+    unsigned char average_g = ((float)curr_g * camera.bufferSize + (float)new_g) / ((float)camera.bufferSize + 1);
+    unsigned char average_b = ((float)curr_b * camera.bufferSize + (float)new_b) / ((float)camera.bufferSize + 1);
+
+    pixels[idx] = make_uchar4(average_r, average_g, average_b, 255);
+
     return;
 }
 

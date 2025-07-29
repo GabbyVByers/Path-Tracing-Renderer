@@ -194,45 +194,57 @@ public:
         renderKernel <<<grid, block>>> (devPtr, width, height, devSpheres, numSpheres, camera);
     }
 
-    void processKeyboardInput(Camera& camera)
+    void processKeyboardMouseInput(Camera& camera)
     {
+        camera.redrawScene = false;
         vec3 forward = { camera.direction.x, 0.0f, camera.direction.z };
         normalize(forward);
-        
         vec3 right = camera.direction * camera.up;
         vec3 up = { 0.0f, 1.0f, 0.0f };
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        {
             camera.position += forward;
+            camera.redrawScene = true;
+        }
 
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        {
             camera.position -= forward;
+            camera.redrawScene = true;
+        }
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        {
             camera.position += right;
+            camera.redrawScene = true;
+        }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        {
             camera.position -= right;
+            camera.redrawScene = true;
+        }
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
             camera.position += up;
+            camera.redrawScene = true;
+        }
 
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        {
             camera.position -= up;
-    }
+            camera.redrawScene = true;
+        }
 
-    void processMouseInput(Camera& camera)
-    {
         double currMouseX;
         double currMouseY;
         glfwGetCursorPos(window, &currMouseX, &currMouseY);
-
         double mouseRelX = currMouseX - prevMouseX;
         double mouseRelY = currMouseY - prevMouseY;
-
         prevMouseX = currMouseX;
         prevMouseY = currMouseY;
-
         ImGuiIO& io = ImGui::GetIO();
         bool mouseFree = !io.WantCaptureMouse;
 
@@ -242,19 +254,18 @@ public:
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
             return;
 
-        vec3 up = { 0.0f, 1.0f, 0.0f };
-        float magicNum = 0.005f;
-
         if (mouseRelX != 0.0f)
         {
-            camera.direction = rotate(camera.direction, up, magicNum * -mouseRelX);
+            camera.direction = rotate(camera.direction, up, 0.005f * -mouseRelX);
             fixCamera(camera);
+            camera.redrawScene = true;
         }
 
         if (mouseRelY != 0.0f)
         {
-            camera.direction = rotate(camera.direction, camera.right, magicNum * -mouseRelY);
+            camera.direction = rotate(camera.direction, camera.right, 0.005f * -mouseRelY);
             fixCamera(camera);
+            camera.redrawScene = true;
         }
     }
 

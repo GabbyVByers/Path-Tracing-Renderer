@@ -28,13 +28,15 @@ int main()
     camera.position  = { 11.3f, 8.0f, -10.0f };
     camera.direction = { -0.5f, -0.5f, 0.7f };
     camera.depth     = 1.5f;
+    camera.frameOffset = 1;
+    camera.bufferSize = 100;
     fixCamera(camera);
 
     while (!glfwWindowShouldClose(renderer.window))
     {
+        camera.frameOffset++;
         renderer.launchCudaKernel(devSpheres, numSpheres, camera);
-        renderer.processKeyboardInput(camera);
-        renderer.processMouseInput(camera);
+        renderer.processKeyboardMouseInput(camera);
         renderer.renderTexturedQuad(camera);
     }
 
