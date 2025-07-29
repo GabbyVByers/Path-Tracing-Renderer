@@ -196,7 +196,7 @@ public:
 
     void processKeyboardMouseInput(Camera& camera)
     {
-        camera.redrawScene = false;
+        camera.bufferSize++;
         vec3 forward = { camera.direction.x, 0.0f, camera.direction.z };
         normalize(forward);
         vec3 right = camera.direction * camera.up;
@@ -205,37 +205,37 @@ public:
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
             camera.position += forward;
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
             camera.position -= forward;
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
             camera.position += right;
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
             camera.position -= right;
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         {
             camera.position += up;
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         {
             camera.position -= up;
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
 
         double currMouseX;
@@ -258,14 +258,14 @@ public:
         {
             camera.direction = rotate(camera.direction, up, 0.005f * -mouseRelX);
             fixCamera(camera);
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
 
         if (mouseRelY != 0.0f)
         {
             camera.direction = rotate(camera.direction, camera.right, 0.005f * -mouseRelY);
             fixCamera(camera);
-            camera.redrawScene = true;
+            camera.bufferSize = 0;
         }
     }
 
@@ -287,7 +287,8 @@ public:
         ImGui::NewFrame();
 
         ImGui::Begin("Debugger");
-        ImGui::SliderInt("Rays Per Pixel", &camera.raysPerPixel, 0, 15);
+        ImGui::SliderInt("Buffer Limit", &camera.bufferLimit, 0, 500);
+        ImGui::SliderInt("Rays Per Pixel", &camera.raysPerPixel, 0, 100);
 
         ImGui::SliderFloat("Light Source x:", &camera.lightDirection.x, -1.0f, 1.0f);
         ImGui::SliderFloat("Light Source y:", &camera.lightDirection.y, -1.0f, 1.0f);

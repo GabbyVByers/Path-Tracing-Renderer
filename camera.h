@@ -12,9 +12,9 @@ struct Camera
 
     float depth;
     int raysPerPixel;
-    int frameOffset;
     int bufferSize;
-    bool redrawScene;
+    int bufferLimit;
+    unsigned int uniqeFrameHash;
 };
 
 inline void fixCamera(Camera& camera)

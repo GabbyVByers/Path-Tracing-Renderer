@@ -33,6 +33,12 @@ __host__ __device__ inline void hash_uint32(uint32& state)
     state ^= state >> 14;
 }
 
+__host__ __device__ inline unsigned int hash_combine(unsigned int x, unsigned int y)
+{
+    x ^= y + 0x9e3779b9 + (x << 6) + (x >> 2);
+    return x;
+}
+
 __host__ __device__ inline float randomFloatFromInt(uint32& state)
 {
     hash_uint32(state);
