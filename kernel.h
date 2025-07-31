@@ -8,11 +8,13 @@
 #include "random.h"
 #include <cfloat>
 
-__device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere* dev_spheres, const int& num_spheres) {
+__device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere* dev_spheres, const int& num_spheres)
+{
     hit_info info = { false };
     float closest_t = FLT_MAX;
     
-    for (int i = 0; i < num_spheres; i++) {
+    for (int i = 0; i < num_spheres; i++)
+    {
         vec3 V = ray.origin - dev_spheres[i].position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
@@ -20,18 +22,23 @@ __device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
+        {
             continue;
+        }
 
         float t1 = ((-b) + sqrt(discriminant)) / (2.0f * a);
         float t2 = ((-b) - sqrt(discriminant)) / (2.0f * a);
         float t = fmin(t1, t2);
 
         if (t <= 0.0f)
+        {
             continue;
+        }
 
         info.did_hit = true;
         
-        if (t < closest_t) {
+        if (t < closest_t)
+        {
             closest_t = t;
             info.hit_color = dev_spheres[i].color;
             info.hit_location = ray.origin + (ray.direction * t);
@@ -43,26 +50,33 @@ __device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere
     return info;
 }
 
-__device__ inline vec3 sky_color(const vec3& direction, const vec3& light_direction) {
+__device__ inline vec3 sky_color(const vec3& direction, const vec3& light_direction)
+{
     vec3 skyWhite    = rgb(255, 255, 255);
     vec3 skyBlue     = rgb(57, 162, 237);
     vec3 groundColor = rgb(143, 136, 130);
 
     if (direction.y < 0.0f)
+    {
         return groundColor;
+    }
 
     if (dot(light_direction, direction) > 0.997f)
+    {
         return skyWhite;
+    }
     
     return skyBlue;
 }
 
-__device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSpheres, const int& numSpheres, unsigned int& randomState, const camera& cam) {
+__device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSpheres, const int& numSpheres, unsigned int& randomState, const camera& cam)
+{
     vec3 rayColor = { 1.0f, 1.0f, 1.0f };
 
     hit_info info = ray_spheres_intersection(ray, devSpheres, numSpheres);
 
-    if (!info.did_hit) {
+    if (!info.did_hit)
+    {
         return sky_color(ray.direction, cam.light_direction);
     }
 
@@ -74,15 +88,13 @@ __device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSphere
 
     hit_info shadowInfo = ray_spheres_intersection(ray, devSpheres, numSpheres);
 
-    if (shadowInfo.did_hit) {
+    if (shadowInfo.did_hit)
+    {
         return multiply(rayColor, { 0.3f, 0.3f, 0.3f });
     }
 
     return rayColor;
 }
-
-
-
 
 __global__ inline void renderKernel(uchar4* pixels, int width, int height, sphere* dev_spheres, int num_spheres, camera cam)
 {

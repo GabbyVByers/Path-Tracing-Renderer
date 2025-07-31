@@ -19,7 +19,9 @@ __device__ inline thread get_thread(const int& width, const int& height)
     thread.y = blockIdx.y * blockDim.y + threadIdx.y;
     thread.index = -1;
     if ((thread.x < width) && (thread.y < height))
+    {
         thread.index = thread.y * width + thread.x;
+    }
     thread.u = ((thread.x / (float)width) * 2.0f - 1.0f) * (width / (float)height);
     thread.v = (thread.y / (float)height) * 2.0f - 1.0f;
     return thread;

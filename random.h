@@ -50,7 +50,9 @@ __host__ __device__ inline vec3 random_hemisphere_direction(const vec3& normal, 
     normalize(direction);
 
     if (dot(direction, normal) < 0.0f)
+    {
         direction *= -1.0f;
+    }
 
     return direction;
 }

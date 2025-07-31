@@ -16,23 +16,27 @@ class interop_renderer
 {
 public:
 
-    const char* vertex_shader_src = R"glsl(
+    const char* vertex_shader_src =
+    R"glsl(
         #version 330 core
         layout (location = 0) in vec2 a_pos;
         layout (location = 1) in vec2 a_tex;
         out vec2 tex_coord;
-        void main() {
+        void main()
+        {
             gl_Position = vec4(a_pos.xy, 0.0, 1.0);
             tex_coord = a_tex;
         }
     )glsl";
 
-    const char* fragment_shader_src = R"glsl(
+    const char* fragment_shader_src =
+    R"glsl(
         #version 330 core
         in vec2 tex_coord;
         out vec4 frag_color;
         uniform sampler2D screen_texture;
-        void main() {
+        void main()
+        {
             frag_color = texture(screen_texture, tex_coord);
         }
     )glsl";
@@ -63,12 +67,14 @@ public:
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-        if (full_screen) {
+        if (full_screen)
+        {
             primary = glfwGetPrimaryMonitor();
             width = glfwGetVideoMode(primary)->width;
             height = glfwGetVideoMode(primary)->height;
             window = glfwCreateWindow(width, height, title.c_str(), primary, nullptr);
-        } else {
+        } else
+        {
             width = screen_width;
             height = screen_height;
             window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
@@ -178,7 +184,9 @@ public:
     void launch_cuda_kernel(sphere* dev_spheres, int num_spheres, camera cam)
     {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
             glfwSetWindowShouldClose(window, true);
+        }
 
         uchar4* dev_ptr;
         size_t size;
@@ -201,32 +209,38 @@ public:
             slow = 0.1f;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        {
             cam.position += forward * slow;
             cam.buffer_size = 0;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        {
             cam.position -= forward * slow;
             cam.buffer_size = 0;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        {
             cam.position += right * slow;
             cam.buffer_size = 0;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        {
             cam.position -= right * slow;
             cam.buffer_size = 0;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
             cam.position += up * slow;
             cam.buffer_size = 0;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        {
             cam.position -= up * slow;
             cam.buffer_size = 0;
         }
