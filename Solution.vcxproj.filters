@@ -100,6 +100,9 @@
     <CudaCompile Include="DataStructures.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
+    <CudaCompile Include="thread.h">
+      <Filter>Header Files</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">

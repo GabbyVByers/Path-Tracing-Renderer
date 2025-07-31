@@ -12,8 +12,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-class interop_renderer {
-
+class interop_renderer
+{
 public:
 
     const char* vertex_shader_src = R"glsl(
@@ -55,7 +55,8 @@ public:
     double prev_mouse_x;
     double prev_mouse_y;
 
-    interop_renderer(int screen_width, int screen_height, std::string title, bool full_screen) {
+    interop_renderer(int screen_width, int screen_height, std::string title, bool full_screen)
+    {
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -98,7 +99,8 @@ public:
         prev_mouse_y = 0.0f;
     }
 
-    ~interop_renderer() {
+    ~interop_renderer()
+    {
         cudaGraphicsUnregisterResource(cuda_pbo);
         glDeleteBuffers(1, &pbo);
         glDeleteTextures(1, &texture_id);
@@ -109,7 +111,8 @@ public:
         glfwTerminate();
     }
 
-    void create_pbo() {
+    void create_pbo()
+    {
         glGenBuffers(1, &pbo);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
         glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height * 4, nullptr, GL_DYNAMIC_DRAW);
@@ -117,7 +120,8 @@ public:
         cudaGraphicsGLRegisterBuffer(&cuda_pbo, pbo, cudaGraphicsMapFlagsWriteDiscard);
     }
 
-    void create_texture() {
+    void create_texture()
+    {
         glGenTextures(1, &texture_id);
         glBindTexture(GL_TEXTURE_2D, texture_id);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -126,14 +130,16 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    GLuint create_shader_program() {
-        auto compile_shader = [](GLenum type, const char* src) { // EXTRACT ME
-            GLuint shader = glCreateShader(type);
-            glShaderSource(shader, 1, &src, nullptr);
-            glCompileShader(shader);
-            return shader;
-        };
+    GLuint compile_shader(GLenum type, const char* src)
+    {
+        GLuint shader = glCreateShader(type);
+        glShaderSource(shader, 1, &src, nullptr);
+        glCompileShader(shader);
+        return shader;
+    }
 
+    GLuint create_shader_program()
+    {
         GLuint vert = compile_shader(GL_VERTEX_SHADER, vertex_shader_src);
         GLuint frag = compile_shader(GL_FRAGMENT_SHADER, fragment_shader_src);
         GLuint program = glCreateProgram();
@@ -145,8 +151,10 @@ public:
         return program;
     }
 
-    void create_fullscreen_quad(GLuint& VAO, GLuint& VBO) {
-        float quad_vertices[] = {
+    void create_fullscreen_quad(GLuint& VAO, GLuint& VBO)
+    {
+        float quad_vertices[] =
+        {
             -1.0f,  1.0f,   0.0f, 1.0f,
             -1.0f, -1.0f,   0.0f, 0.0f,
              1.0f, -1.0f,   1.0f, 0.0f,
@@ -167,7 +175,8 @@ public:
         glBindVertexArray(0);
     }
 
-    void launch_cuda_kernel(sphere* dev_spheres, int num_spheres, camera cam) {
+    void launch_cuda_kernel(sphere* dev_spheres, int num_spheres, camera cam)
+    {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
@@ -178,40 +187,47 @@ public:
         renderKernel <<<grid, block>>> (dev_ptr, width, height, dev_spheres, num_spheres, cam);
     }
 
-    void process_keyboard_mouse_input(camera& cam) {
+    void process_keyboard_mouse_input(camera& cam)
+    {
         cam.buffer_size++;
         vec3 forward = { cam.direction.x, 0.0f, cam.direction.z };
         normalize(forward);
         vec3 right = cam.direction * cam.up;
         vec3 up = { 0.0f, 1.0f, 0.0f };
 
+        float slow = 1.0f;
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+        {
+            slow = 0.1f;
+        }
+
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            cam.position += forward;
+            cam.position += forward * slow;
             cam.buffer_size = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            cam.position -= forward;
+            cam.position -= forward * slow;
             cam.buffer_size = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-            cam.position += right;
+            cam.position += right * slow;
             cam.buffer_size = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            cam.position -= right;
+            cam.position -= right * slow;
             cam.buffer_size = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-            cam.position += up;
+            cam.position += up * slow;
             cam.buffer_size = 0;
         }
 
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-            cam.position -= up;
+            cam.position -= up * slow;
             cam.buffer_size = 0;
         }
 
@@ -225,25 +241,33 @@ public:
         ImGuiIO& io = ImGui::GetIO();
 
         if (io.WantCaptureMouse)
+        {
+            cam.buffer_size = 0;
             return;
+        }
 
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
+        {
             return;
+        }
 
-        if (mouse_rel_x != 0.0f) {
+        if (mouse_rel_x != 0.0f)
+        {
             cam.direction = rotate(cam.direction, up, 0.005f * -mouse_rel_x);
             fix_camera(cam);
             cam.buffer_size = 0;
         }
 
-        if (mouse_rel_y != 0.0f) {
+        if (mouse_rel_y != 0.0f)
+        {
             cam.direction = rotate(cam.direction, cam.right, 0.005f * -mouse_rel_y);
             fix_camera(cam);
             cam.buffer_size = 0;
         }
     }
 
-    void render_textured_quad(camera& cam) {
+    void render_textured_quad(camera& cam)
+    {
         cudaGraphicsUnmapResources(1, &cuda_pbo, 0);
         glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
         glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -275,7 +299,8 @@ public:
         glfwPollEvents();
     }
 
-    int screen_size() {
+    int screen_size()
+    {
         return width * height;
     }
 };

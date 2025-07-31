@@ -29,7 +29,7 @@ int main()
     cam.direction = { -0.5f, -0.5f, 0.7f };
     cam.depth     = 1.5f;
     cam.buffer_size = 0;
-    cam.buffer_limit = 500;
+    cam.buffer_limit = 1000;
     fix_camera(cam);
 
     unsigned int* hostHashArray = nullptr;

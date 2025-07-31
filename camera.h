@@ -2,7 +2,8 @@
 
 #include "vec3.h"
 
-struct camera {
+struct camera
+{
     vec3 position;
     vec3 direction;
     vec3 up;
@@ -17,7 +18,8 @@ struct camera {
     vec3* device_true_frame_buffer;
 };
 
-inline void fix_camera(camera& cam) {
+inline void fix_camera(camera& cam)
+{
     const vec3 up = { 0.0f, 1.0f, 0.0f };
     normalize(cam.direction);
     cam.right = cam.direction * up;

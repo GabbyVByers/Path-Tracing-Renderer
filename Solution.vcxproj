@@ -96,6 +96,7 @@
     <CudaCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="thread.h" />
     <CudaCompile Include="dataStructures.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="imgui\imconfig.h" />

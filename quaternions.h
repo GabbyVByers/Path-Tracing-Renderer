@@ -2,11 +2,14 @@
 
 #include "vec3.h"
 
-struct Quaternion {
+struct Quaternion
+{
     float w, x, y, z;
 
-    Quaternion operator * (const Quaternion& b) const {
-        return {
+    Quaternion operator * (const Quaternion& b) const
+    {
+        return
+        {
             (w * b.w) - (x * b.x) - (y * b.y) - (z * b.z),
             (w * b.x) + (x * b.w) + (y * b.z) - (z * b.y),
             (w * b.y) - (x * b.z) + (y * b.w) + (z * b.x),
@@ -15,7 +18,8 @@ struct Quaternion {
     }
 };
 
-inline vec3 rotate(const vec3& a, const vec3& b, const float& theta) {
+inline vec3 rotate(const vec3& a, const vec3& b, const float& theta)
+{
     float half = theta * 0.5f;
     float s = sin(half);
 
