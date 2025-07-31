@@ -2,24 +2,21 @@
 
 #include "vec3.h"
 
-struct Sphere
-{
+struct sphere {
     vec3 position;
     float radius;
     vec3 color;
 };
 
-struct HitInfo
-{
-    bool didHit;
-    bool didHitLightSource;
-    vec3 hitLocation;
-    vec3 hitColor;
-    vec3 hitNormal;
+struct hit_info {
+    bool did_hit;
+    bool did_hit_light_source;
+    vec3 hit_location;
+    vec3 hit_color;
+    vec3 hit_normal;
 };
 
-struct Ray
-{
+struct ray {
     vec3 origin;
     vec3 direction;
 };

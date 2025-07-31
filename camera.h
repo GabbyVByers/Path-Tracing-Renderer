@@ -2,29 +2,27 @@
 
 #include "vec3.h"
 
-struct Camera
-{
+struct camera {
     vec3 position;
     vec3 direction;
     vec3 up;
     vec3 right;
-    vec3 lightDirection;
+    vec3 light_direction;
 
     float depth;
-    int raysPerPixel;
-    int bufferSize;
-    int bufferLimit;
-    unsigned int* deviceHashArray;
-    vec3* deviceTrueFrameBuffer;
+    int rays_per_pixel;
+    int buffer_size;
+    int buffer_limit;
+    unsigned int* device_hash_array;
+    vec3* device_true_frame_buffer;
 };
 
-inline void fixCamera(Camera& camera)
-{
+inline void fix_camera(camera& cam) {
     const vec3 up = { 0.0f, 1.0f, 0.0f };
-    normalize(camera.direction);
-    camera.right = camera.direction * up;
-    normalize(camera.right);
-    camera.up = camera.right * camera.direction;
-    normalize(camera.up);
+    normalize(cam.direction);
+    cam.right = cam.direction * up;
+    normalize(cam.right);
+    cam.up = cam.right * cam.direction;
+    normalize(cam.up);
 }
 
