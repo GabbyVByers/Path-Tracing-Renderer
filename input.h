@@ -2,9 +2,9 @@
 
 #include "opengl.h"
 
-inline void process_keyboard_input(opengl& opengl, camera& camera)
+inline void process_keyboard_input(opengl& opengl, world& world, camera& camera)
 {
-    camera.buffer_size++;
+    world.buffer_size++;
     vec3 forward = { camera.direction.x, 0.0f, camera.direction.z };
     normalize(forward);
     vec3 right = camera.direction * camera.up;
@@ -19,41 +19,41 @@ inline void process_keyboard_input(opengl& opengl, camera& camera)
     if (glfwGetKey(opengl.window, GLFW_KEY_W) == GLFW_PRESS)
     {
         camera.position += forward * slow;
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_S) == GLFW_PRESS)
     {
         camera.position -= forward * slow;
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_D) == GLFW_PRESS)
     {
         camera.position += right * slow;
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_A) == GLFW_PRESS)
     {
         camera.position -= right * slow;
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
         camera.position += up * slow;
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
         camera.position -= up * slow;
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 }
 
-inline void process_mouse_input(opengl& opengl, camera& camera)
+inline void process_mouse_input(opengl& opengl, world& world, camera& camera)
 {
     double curr_mouse_x;
     double curr_mouse_y;
@@ -67,7 +67,7 @@ inline void process_mouse_input(opengl& opengl, camera& camera)
     ImGuiIO& io = ImGui::GetIO();
     if (io.WantCaptureMouse)
     {
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
         return;
     }
 
@@ -80,13 +80,13 @@ inline void process_mouse_input(opengl& opengl, camera& camera)
     {
         camera.direction = rotate(camera.direction, up, 0.005f * -mouse_rel_x);
         fix_camera(camera);
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 
     if (mouse_rel_y != 0.0f)
     {
         camera.direction = rotate(camera.direction, camera.right, 0.005f * -mouse_rel_y);
         fix_camera(camera);
-        camera.buffer_size = 0;
+        world.buffer_size = 0;
     }
 }

@@ -53,8 +53,8 @@ int main()
     while (!glfwWindowShouldClose(opengl.window))
     {
         launch_cuda_kernel(opengl, world, camera);
-        process_keyboard_input(opengl, camera);
-        process_mouse_input(opengl, camera);
+        process_keyboard_input(opengl, world, camera);
+        process_mouse_input(opengl, world, camera);
         render_screen(opengl, camera);
         draw_imgui(world, camera);
         finish_rendering(opengl);
