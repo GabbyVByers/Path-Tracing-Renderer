@@ -97,7 +97,7 @@
     <CudaCompile Include="Kernel.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="opengl_manager.h">
+    <CudaCompile Include="opengl.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="DataStructures.h">

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opengl_manager.h"
+#include "opengl.h"
 #include "dataStructures.h"
 #include "kernel.h"
 
