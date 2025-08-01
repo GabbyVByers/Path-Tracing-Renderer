@@ -12,6 +12,16 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+struct opengl
+{
+
+};
+
+inline void setup_opengl()
+{
+
+}
+
 class interop_renderer
 {
 public:
@@ -292,6 +302,7 @@ public:
         glBindVertexArray(quad_vao);
         glBindTexture(GL_TEXTURE_2D, texture_id);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -309,6 +320,7 @@ public:
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
