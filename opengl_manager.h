@@ -4,11 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <cuda_gl_interop.h>
 #include <string>
-#include "kernel.h"
-#include "dataStructures.h"
+#include "gui.h"
 #include "quaternions.h"
-
-
 
 struct opengl
 {
@@ -148,8 +145,6 @@ inline int screen_size(const opengl& opengl)
     return opengl.screen_width * opengl.screen_height;
 }
 
-
-
 inline void process_keyboard_mouse_input(opengl& opengl, camera& cam)
 {
     cam.buffer_size++;
@@ -208,12 +203,12 @@ inline void process_keyboard_mouse_input(opengl& opengl, camera& cam)
     opengl.prev_mouse_x = curr_mouse_x;
     opengl.prev_mouse_y = curr_mouse_y;
     
-    //ImGuiIO& io = ImGui::GetIO();
-    //if (io.WantCaptureMouse)
-    //{
-    //    cam.buffer_size = 0;
-    //    return;
-    //}
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureMouse)
+    {
+        cam.buffer_size = 0;
+        return;
+    }
 
     if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
     {
@@ -248,8 +243,6 @@ inline void render_textured_quad(opengl& opengl, camera& cam)
     glBindTexture(GL_TEXTURE_2D, opengl.texture_id);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    
-
     glfwSwapBuffers(opengl.window);
     glfwPollEvents();
 
@@ -258,3 +251,4 @@ inline void render_textured_quad(opengl& opengl, camera& cam)
         glfwSetWindowShouldClose(opengl.window, true);
     }
 }
+

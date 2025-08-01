@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vec3.h"
+#include <cmath>
 
 inline float random_float(float min, float max)
 {

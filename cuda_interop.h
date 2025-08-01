@@ -1,8 +1,10 @@
 #pragma once
 
 #include "opengl_manager.h"
+#include "dataStructures.h"
+#include "kernel.h"
 
-void launch_cuda_kernel(opengl& opengl, sphere* dev_spheres, int num_spheres, camera camera)
+inline void launch_cuda_kernel(opengl& opengl, sphere* dev_spheres, int num_spheres, camera camera)
 {
     uchar4* dev_ptr;
     size_t size;
@@ -11,6 +13,6 @@ void launch_cuda_kernel(opengl& opengl, sphere* dev_spheres, int num_spheres, ca
 
     dim3 GRID = opengl.grid;
     dim3 BLOCK = opengl.block;
-    renderKernel <<<GRID, BLOCK>>> (dev_ptr, width, height, dev_spheres, num_spheres, camera);
+    main_kernel <<<GRID, BLOCK>>> (dev_ptr, opengl.screen_width, opengl.screen_height, dev_spheres, num_spheres, camera);
 }
 

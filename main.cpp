@@ -1,14 +1,13 @@
-#include "opengl_manager.h"
-#include "cuda_interop.h"
+
 #include <iostream>
-#include "random.h"
-#include "dataStructures.h"
+#include "cuda_interop.h"
 
 int main()
 {
     opengl opengl;
     const bool FULLSCREEN = false;
     setup_opengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
+    setup_imgui(opengl.window);
 
     // Spheres
     int num_spheres = 5;
@@ -52,9 +51,11 @@ int main()
     {
         launch_cuda_kernel(opengl, dev_spheres, num_spheres, camera);
         process_keyboard_mouse_input(opengl, camera);
+        draw_imgui(camera);
         render_textured_quad(opengl, camera);
     }
 
+    free_opengl(opengl);
     return 0;
 }
 

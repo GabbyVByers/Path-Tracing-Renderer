@@ -1,5 +1,7 @@
 #pragma once
 
+#include "thread.h"
+
 struct vec3
 {
 	float x, y, z;

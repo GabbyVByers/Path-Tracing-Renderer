@@ -1,11 +1,9 @@
 #pragma once
 
 #include "thread.h"
-#include "vec3.h"
-#include "camera.h"
-#include "quaternions.h"
 #include "dataStructures.h"
 #include "random.h"
+#include "camera.h"
 #include <cfloat>
 
 __device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere* dev_spheres, const int& num_spheres)
@@ -96,7 +94,7 @@ __device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSphere
     return rayColor;
 }
 
-__global__ inline void renderKernel(uchar4* pixels, int width, int height, sphere* dev_spheres, int num_spheres, camera cam)
+__global__ inline void main_kernel(uchar4* pixels, int width, int height, sphere* dev_spheres, int num_spheres, camera cam)
 {
     thread thread = get_thread(width, height);
     if (thread.index == -1)
