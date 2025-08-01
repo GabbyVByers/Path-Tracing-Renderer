@@ -77,6 +77,9 @@
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Main.cpp">
@@ -94,13 +97,16 @@
     <CudaCompile Include="Kernel.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="InteropRenderer.h">
+    <CudaCompile Include="opengl_manager.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="DataStructures.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="thread.h">
+      <Filter>Header Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda_interop.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
   </ItemGroup>

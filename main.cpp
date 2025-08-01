@@ -1,11 +1,14 @@
-#include "interopRenderer.h"
+#include "opengl_manager.h"
+#include "cuda_interop.h"
 #include <iostream>
 #include "random.h"
 #include "dataStructures.h"
 
 int main()
 {
-    interop_renderer renderer(1920, 1080, "CUDA OpenGL Path Tracer", false);
+    opengl opengl;
+    const bool FULLSCREEN = false;
+    setup_opengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
 
     // Spheres
     int num_spheres = 5;
@@ -21,35 +24,35 @@ int main()
     cudaMemcpy(dev_spheres, host_spheres, sizeof(sphere) * num_spheres, cudaMemcpyHostToDevice);
 
     // Camera
-    camera cam;
-    cam.rays_per_pixel = 1;
-    cam.light_direction = { 1.0f, 1.0f, 1.0f };
-    normalize(cam.light_direction);
-    cam.position  = { 11.3f, 8.0f, -10.0f };
-    cam.direction = { -0.5f, -0.5f, 0.7f };
-    cam.depth     = 1.5f;
-    cam.buffer_size = 0;
-    cam.buffer_limit = 1000;
-    fix_camera(cam);
+    camera camera;
+    camera.rays_per_pixel = 1;
+    camera.light_direction = { 1.0f, 1.0f, 1.0f };
+    normalize(camera.light_direction);
+    camera.position  = { 11.3f, 8.0f, -10.0f };
+    camera.direction = { -0.5f, -0.5f, 0.7f };
+    camera.depth     = 1.5f;
+    camera.buffer_size = 0;
+    camera.buffer_limit = 1000;
+    fix_camera(camera);
 
     unsigned int* hostHashArray = nullptr;
-    hostHashArray = new unsigned int[renderer.screen_size()];
-    for (int i = 0; i < renderer.screen_size(); i++)
+    hostHashArray = new unsigned int[screen_size(opengl)];
+    for (int i = 0; i < screen_size(opengl); i++)
     {
         unsigned int hash = i;
         hash_uint32(hash);
         hostHashArray[i] = hash;
     }
-    cudaMalloc((void**)&cam.device_hash_array, sizeof(unsigned int) * renderer.screen_size());
-    cudaMemcpy(cam.device_hash_array, hostHashArray, sizeof(unsigned int) * renderer.screen_size(), cudaMemcpyHostToDevice);
+    cudaMalloc((void**)&camera.device_hash_array, sizeof(unsigned int) * screen_size(opengl));
+    cudaMemcpy(camera.device_hash_array, hostHashArray, sizeof(unsigned int) * screen_size(opengl), cudaMemcpyHostToDevice);
 
-    cudaMalloc((void**)&cam.device_true_frame_buffer, sizeof(vec3) * renderer.screen_size());
+    cudaMalloc((void**)&camera.device_true_frame_buffer, sizeof(vec3) * screen_size(opengl));
 
-    while (!glfwWindowShouldClose(renderer.window))
+    while (!glfwWindowShouldClose(opengl.window))
     {
-        renderer.launch_cuda_kernel(dev_spheres, num_spheres, cam);
-        renderer.process_keyboard_mouse_input(cam);
-        renderer.render_textured_quad(cam);
+        launch_cuda_kernel(opengl, dev_spheres, num_spheres, camera);
+        process_keyboard_mouse_input(opengl, camera);
+        render_textured_quad(opengl, camera);
     }
 
     return 0;

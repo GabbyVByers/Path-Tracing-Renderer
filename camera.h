@@ -18,13 +18,13 @@ struct camera
     vec3* device_true_frame_buffer;
 };
 
-inline void fix_camera(camera& cam)
+inline void fix_camera(camera& camera)
 {
     const vec3 up = { 0.0f, 1.0f, 0.0f };
-    normalize(cam.direction);
-    cam.right = cam.direction * up;
-    normalize(cam.right);
-    cam.up = cam.right * cam.direction;
-    normalize(cam.up);
+    normalize(camera.direction);
+    camera.right = camera.direction * up;
+    normalize(camera.right);
+    camera.up = camera.right * camera.direction;
+    normalize(camera.up);
 }
 
