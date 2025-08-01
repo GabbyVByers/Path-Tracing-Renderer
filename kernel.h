@@ -1,9 +1,8 @@
 #pragma once
 
 #include "thread.h"
-#include "dataStructures.h"
+#include "structs.h"
 #include "random.h"
-#include "camera.h"
 #include <cfloat>
 
 __device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere* dev_spheres, const int& num_spheres)
@@ -67,7 +66,7 @@ __device__ inline vec3 sky_color(const vec3& direction, const vec3& light_direct
     return skyBlue;
 }
 
-__device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSpheres, const int& numSpheres, unsigned int& randomState, const camera& cam)
+__device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSpheres, const int& numSpheres, unsigned int& randomState, const camera& camera)
 {
     vec3 rayColor = { 1.0f, 1.0f, 1.0f };
 
@@ -75,14 +74,14 @@ __device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSphere
 
     if (!info.did_hit)
     {
-        return sky_color(ray.direction, cam.light_direction);
+        return sky_color(ray.direction, camera.light_direction);
     }
 
     rayColor *= info.hit_color;
 
 
     ray.origin = info.hit_location + (info.hit_normal * 0.001f);
-    ray.direction = cam.light_direction + (randomDirection(randomState) * 0.15f);
+    ray.direction = camera.light_direction + (randomDirection(randomState) * 0.15f);
 
     hit_info shadowInfo = ray_spheres_intersection(ray, devSpheres, numSpheres);
 
@@ -94,35 +93,35 @@ __device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSphere
     return rayColor;
 }
 
-__global__ inline void main_kernel(uchar4* pixels, int width, int height, sphere* dev_spheres, int num_spheres, camera cam)
+__global__ inline void main_kernel(uchar4* pixels, int width, int height, sphere* dev_spheres, int num_spheres, camera camera)
 {
     thread thread = get_thread(width, height);
     if (thread.index == -1)
         return;
 
-    unsigned int& random_state = cam.device_hash_array[thread.index];
+    unsigned int& random_state = camera.device_hash_array[thread.index];
 
     
 
     vec3 incoming_light = { 0.0f, 0.0f, 0.0f };
-    ray ray = { cam.position, (cam.direction * cam.depth) + (cam.up * thread.v) + (cam.right * thread.u) };
+    ray ray = { camera.position, (camera.direction * camera.depth) + (camera.up * thread.v) + (camera.right * thread.u) };
     normalize(ray.direction);
-    for (int i = 0; i < cam.rays_per_pixel; i++)
+    for (int i = 0; i < camera.rays_per_pixel; i++)
     {
-        incoming_light += calculate_incoming_light(ray, dev_spheres, num_spheres, random_state, cam);
+        incoming_light += calculate_incoming_light(ray, dev_spheres, num_spheres, random_state, camera);
     }
-    incoming_light /= cam.rays_per_pixel;
+    incoming_light /= camera.rays_per_pixel;
 
-    if (cam.buffer_size > cam.buffer_limit)
+    if (camera.buffer_size > camera.buffer_limit)
     {
         return;
     }
 
     vec3 new_color = incoming_light;
-    vec3 curr_color = cam.device_true_frame_buffer[thread.index];
-    vec3 average_color = (curr_color * (float)cam.buffer_size + new_color) / ((float)cam.buffer_size + 1.0f);
+    vec3 curr_color = camera.device_true_frame_buffer[thread.index];
+    vec3 average_color = (curr_color * (float)camera.buffer_size + new_color) / ((float)camera.buffer_size + 1.0f);
 
-    cam.device_true_frame_buffer[thread.index] = average_color;
+    camera.device_true_frame_buffer[thread.index] = average_color;
 
     unsigned char r = average_color.x * 255.0f;
     unsigned char g = average_color.y * 255.0f;

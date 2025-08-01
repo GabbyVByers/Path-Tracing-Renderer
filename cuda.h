@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opengl.h"
-#include "dataStructures.h"
+#include "structs.h"
 #include "kernel.h"
 
 inline void launch_cuda_kernel(opengl& opengl, sphere* dev_spheres, int num_spheres, camera camera)

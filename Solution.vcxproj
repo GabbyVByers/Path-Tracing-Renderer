@@ -96,10 +96,10 @@
     <CudaCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="input.h" />
     <CudaCompile Include="thread.h" />
-    <CudaCompile Include="dataStructures.h" />
-    <ClInclude Include="camera.h" />
-    <CudaCompile Include="cuda_interop.h" />
+    <CudaCompile Include="structs.h" />
+    <CudaCompile Include="cuda.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />

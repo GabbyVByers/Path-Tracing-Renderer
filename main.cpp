@@ -1,6 +1,7 @@
 
 #include <iostream>
-#include "cuda_interop.h"
+#include "cuda.h"
+#include "input.h"
 
 int main()
 {
@@ -50,9 +51,11 @@ int main()
     while (!glfwWindowShouldClose(opengl.window))
     {
         launch_cuda_kernel(opengl, dev_spheres, num_spheres, camera);
-        process_keyboard_mouse_input(opengl, camera);
+        process_keyboard_input(opengl, camera);
+        process_mouse_input(opengl, camera);
+        render_screen(opengl, camera);
         draw_imgui(camera);
-        render_textured_quad(opengl, camera);
+        finish_rendering(opengl);
     }
 
     free_opengl(opengl);

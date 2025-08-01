@@ -145,92 +145,7 @@ inline int screen_size(const opengl& opengl)
     return opengl.screen_width * opengl.screen_height;
 }
 
-inline void process_keyboard_mouse_input(opengl& opengl, camera& cam)
-{
-    cam.buffer_size++;
-    vec3 forward = { cam.direction.x, 0.0f, cam.direction.z };
-    normalize(forward);
-    vec3 right = cam.direction * cam.up;
-    vec3 up = { 0.0f, 1.0f, 0.0f };
-
-    float slow = 1.0f;
-    if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-    {
-        slow = 0.1f;
-    }
-
-    if (glfwGetKey(opengl.window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        cam.position += forward * slow;
-        cam.buffer_size = 0;
-    }
-
-    if (glfwGetKey(opengl.window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        cam.position -= forward * slow;
-        cam.buffer_size = 0;
-    }
-
-    if (glfwGetKey(opengl.window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        cam.position += right * slow;
-        cam.buffer_size = 0;
-    }
-
-    if (glfwGetKey(opengl.window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        cam.position -= right * slow;
-        cam.buffer_size = 0;
-    }
-
-    if (glfwGetKey(opengl.window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        cam.position += up * slow;
-        cam.buffer_size = 0;
-    }
-
-    if (glfwGetKey(opengl.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    {
-        cam.position -= up * slow;
-        cam.buffer_size = 0;
-    }
-
-    double curr_mouse_x;
-    double curr_mouse_y;
-    glfwGetCursorPos(opengl.window, &curr_mouse_x, &curr_mouse_y);
-    double mouse_rel_x = curr_mouse_x - opengl.prev_mouse_x;
-    double mouse_rel_y = curr_mouse_y - opengl.prev_mouse_y;
-    opengl.prev_mouse_x = curr_mouse_x;
-    opengl.prev_mouse_y = curr_mouse_y;
-    
-    ImGuiIO& io = ImGui::GetIO();
-    if (io.WantCaptureMouse)
-    {
-        cam.buffer_size = 0;
-        return;
-    }
-
-    if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
-    {
-        return;
-    }
-
-    if (mouse_rel_x != 0.0f)
-    {
-        cam.direction = rotate(cam.direction, up, 0.005f * -mouse_rel_x);
-        fix_camera(cam);
-        cam.buffer_size = 0;
-    }
-
-    if (mouse_rel_y != 0.0f)
-    {
-        cam.direction = rotate(cam.direction, cam.right, 0.005f * -mouse_rel_y);
-        fix_camera(cam);
-        cam.buffer_size = 0;
-    }
-}
-
-inline void render_textured_quad(opengl& opengl, camera& cam)
+inline void render_screen(opengl& opengl, camera& cam)
 {
     cudaGraphicsUnmapResources(1, &opengl.cuda_pbo, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.pbo);
@@ -242,13 +157,15 @@ inline void render_textured_quad(opengl& opengl, camera& cam)
     glBindVertexArray(opengl.quad_vao);
     glBindTexture(GL_TEXTURE_2D, opengl.texture_id);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    
+}
 
+inline void finish_rendering(opengl& opengl)
+{
     glfwSwapBuffers(opengl.window);
     glfwPollEvents();
-
     if (glfwGetKey(opengl.window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(opengl.window, true);
     }
 }
-
