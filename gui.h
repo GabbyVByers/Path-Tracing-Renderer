@@ -20,18 +20,18 @@ inline void setup_imgui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-inline void draw_imgui(camera& camera)
+inline void draw_imgui(world& world, camera& camera)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGui::Begin("Debugger");
-    ImGui::SliderInt("Buffer Limit", &camera.buffer_limit, 0, 500);
-    ImGui::SliderInt("Rays Per Pixel", &camera.rays_per_pixel, 0, 100);
-    ImGui::SliderFloat("Light Source x:", &camera.light_direction.x, -1.0f, 1.0f);
-    ImGui::SliderFloat("Light Source y:", &camera.light_direction.y, -1.0f, 1.0f);
-    ImGui::SliderFloat("Light Source z:", &camera.light_direction.z, -1.0f, 1.0f);
-    normalize(camera.light_direction);
+    ImGui::SliderInt("Buffer Limit", &world.buffer_limit, 0, 500);
+    ImGui::SliderInt("Rays Per Pixel", &world.rays_per_pixel, 0, 100);
+    ImGui::SliderFloat("Light Source x:", &world.light_direction.x, -1.0f, 1.0f);
+    ImGui::SliderFloat("Light Source y:", &world.light_direction.y, -1.0f, 1.0f);
+    ImGui::SliderFloat("Light Source z:", &world.light_direction.z, -1.0f, 1.0f);
+    normalize(world.light_direction);
     ImGui::Text("Camera Position x:%.2f, y:%.2f, z:%.2f", camera.position.x, camera.position.y, camera.position.z);
     ImGui::Text("Camera Direction x:%.2f, y:%.2f, z:%.2f", camera.direction.x, camera.direction.y, camera.direction.z);
     ImGui::Text("Camera Up x:%.2f, y:%.2f, z:%.2f", camera.up.x, camera.up.y, camera.up.z);

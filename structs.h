@@ -30,14 +30,7 @@ struct camera
     vec3 direction;
     vec3 up;
     vec3 right;
-    vec3 light_direction;
-
     float depth;
-    int rays_per_pixel;
-    int buffer_size;
-    int buffer_limit;
-    unsigned int* device_hash_array;
-    vec3* device_true_frame_buffer;
 };
 
 inline void fix_camera(camera& camera)
@@ -49,4 +42,16 @@ inline void fix_camera(camera& camera)
     camera.up = camera.right * camera.direction;
     normalize(camera.up);
 }
+
+struct world
+{
+    vec3 light_direction;
+    int rays_per_pixel;
+    int buffer_size;
+    int buffer_limit;
+    unsigned int* device_hash_array;
+    vec3* device_true_frame_buffer;
+    sphere* device_spheres;
+    int num_spheres;
+};
 

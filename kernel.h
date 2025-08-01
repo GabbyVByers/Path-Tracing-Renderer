@@ -5,17 +5,17 @@
 #include "random.h"
 #include <cfloat>
 
-__device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere* dev_spheres, const int& num_spheres)
+__device__ inline hit_info ray_spheres_intersection(const ray& ray, const world& world)
 {
     hit_info info = { false };
     float closest_t = FLT_MAX;
     
-    for (int i = 0; i < num_spheres; i++)
+    for (int i = 0; i < world.num_spheres; i++)
     {
-        vec3 V = ray.origin - dev_spheres[i].position;
+        vec3 V = ray.origin - world.device_spheres[i].position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
-        float c = dot(V, V) - (dev_spheres[i].radius * dev_spheres[i].radius);
+        float c = dot(V, V) - (world.device_spheres[i].radius * world.device_spheres[i].radius);
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
@@ -37,9 +37,9 @@ __device__ inline hit_info ray_spheres_intersection(const ray& ray, const sphere
         if (t < closest_t)
         {
             closest_t = t;
-            info.hit_color = dev_spheres[i].color;
+            info.hit_color = world.device_spheres[i].color;
             info.hit_location = ray.origin + (ray.direction * t);
-            info.hit_normal = info.hit_location - dev_spheres[i].position;
+            info.hit_normal = info.hit_location - world.device_spheres[i].position;
             normalize(info.hit_normal);
         }
     }
@@ -66,24 +66,24 @@ __device__ inline vec3 sky_color(const vec3& direction, const vec3& light_direct
     return skyBlue;
 }
 
-__device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSpheres, const int& numSpheres, unsigned int& randomState, const camera& camera)
+__device__ inline vec3 calculate_incoming_light(ray ray, unsigned int& randomState, const world& world, const camera& camera)
 {
     vec3 rayColor = { 1.0f, 1.0f, 1.0f };
 
-    hit_info info = ray_spheres_intersection(ray, devSpheres, numSpheres);
+    hit_info info = ray_spheres_intersection(ray, world);
 
     if (!info.did_hit)
     {
-        return sky_color(ray.direction, camera.light_direction);
+        return sky_color(ray.direction, world.light_direction);
     }
 
     rayColor *= info.hit_color;
 
 
     ray.origin = info.hit_location + (info.hit_normal * 0.001f);
-    ray.direction = camera.light_direction + (randomDirection(randomState) * 0.15f);
+    ray.direction = world.light_direction + (randomDirection(randomState) * 0.15f);
 
-    hit_info shadowInfo = ray_spheres_intersection(ray, devSpheres, numSpheres);
+    hit_info shadowInfo = ray_spheres_intersection(ray, world);
 
     if (shadowInfo.did_hit)
     {
@@ -93,35 +93,35 @@ __device__ inline vec3 calculate_incoming_light(ray ray, const sphere* devSphere
     return rayColor;
 }
 
-__global__ inline void main_kernel(uchar4* pixels, int width, int height, sphere* dev_spheres, int num_spheres, camera camera)
+__global__ inline void main_kernel(uchar4* pixels, int width, int height, world world, camera camera)
 {
     thread thread = get_thread(width, height);
     if (thread.index == -1)
         return;
 
-    unsigned int& random_state = camera.device_hash_array[thread.index];
+    unsigned int& random_state = world.device_hash_array[thread.index];
 
     
 
     vec3 incoming_light = { 0.0f, 0.0f, 0.0f };
     ray ray = { camera.position, (camera.direction * camera.depth) + (camera.up * thread.v) + (camera.right * thread.u) };
     normalize(ray.direction);
-    for (int i = 0; i < camera.rays_per_pixel; i++)
+    for (int i = 0; i < world.rays_per_pixel; i++)
     {
-        incoming_light += calculate_incoming_light(ray, dev_spheres, num_spheres, random_state, camera);
+        incoming_light += calculate_incoming_light(ray, random_state, world, camera);
     }
-    incoming_light /= camera.rays_per_pixel;
+    incoming_light /= world.rays_per_pixel;
 
-    if (camera.buffer_size > camera.buffer_limit)
+    if (world.buffer_size > world.buffer_limit)
     {
         return;
     }
 
     vec3 new_color = incoming_light;
-    vec3 curr_color = camera.device_true_frame_buffer[thread.index];
-    vec3 average_color = (curr_color * (float)camera.buffer_size + new_color) / ((float)camera.buffer_size + 1.0f);
+    vec3 curr_color = world.device_true_frame_buffer[thread.index];
+    vec3 average_color = (curr_color * (float)world.buffer_size + new_color) / ((float)world.buffer_size + 1.0f);
 
-    camera.device_true_frame_buffer[thread.index] = average_color;
+    world.device_true_frame_buffer[thread.index] = average_color;
 
     unsigned char r = average_color.x * 255.0f;
     unsigned char g = average_color.y * 255.0f;

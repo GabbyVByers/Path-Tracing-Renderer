@@ -4,7 +4,7 @@
 #include "structs.h"
 #include "kernel.h"
 
-inline void launch_cuda_kernel(opengl& opengl, sphere* dev_spheres, int num_spheres, camera camera)
+inline void launch_cuda_kernel(opengl& opengl, world world, camera camera)
 {
     uchar4* dev_ptr;
     size_t size;
@@ -13,6 +13,6 @@ inline void launch_cuda_kernel(opengl& opengl, sphere* dev_spheres, int num_sphe
 
     dim3 GRID = opengl.grid;
     dim3 BLOCK = opengl.block;
-    main_kernel <<<GRID, BLOCK>>> (dev_ptr, opengl.screen_width, opengl.screen_height, dev_spheres, num_spheres, camera);
+    main_kernel <<<GRID, BLOCK>>> (dev_ptr, opengl.screen_width, opengl.screen_height, world, camera);
 }
 
