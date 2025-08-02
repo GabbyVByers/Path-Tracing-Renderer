@@ -23,7 +23,6 @@ struct opengl
     dim3 grid = 0;
     double prev_mouse_x = 0.0f;
     double prev_mouse_y = 0.0f;
-
 };
 
 inline void setup_opengl(opengl& opengl, int screen_width, int screen_height, std::string title, bool full_screen)
@@ -169,3 +168,4 @@ inline void finish_rendering(opengl& opengl)
         glfwSetWindowShouldClose(opengl.window, true);
     }
 }
+

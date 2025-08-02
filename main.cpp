@@ -6,11 +6,9 @@
 int main()
 {
     opengl opengl;
-    const bool FULLSCREEN = false;
+    const bool FULLSCREEN = true;
     setup_opengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
     setup_imgui(opengl.window);
-
-    
 
     // Camera
     camera camera;

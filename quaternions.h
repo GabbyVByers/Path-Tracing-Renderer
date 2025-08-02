@@ -2,11 +2,11 @@
 
 #include "vec3.h"
 
-struct Quaternion
+struct quaternion
 {
     float w, x, y, z;
 
-    Quaternion operator * (const Quaternion& b) const
+    quaternion operator * (const quaternion& b) const
     {
         return
         {
@@ -23,11 +23,11 @@ inline vec3 rotate(const vec3& a, const vec3& b, const float& theta)
     float half = theta * 0.5f;
     float s = sin(half);
 
-    Quaternion q = { cos(half), b.x * s, b.y * s, b.z * s };
-    Quaternion qinv = { q.w, -q.x, -q.y, -q.z };
-    Quaternion p = { 0.0f, a.x, a.y, a.z };
-    Quaternion qp = q * p;
-    Quaternion result = qp * qinv;
+    quaternion q = { cos(half), b.x * s, b.y * s, b.z * s };
+    quaternion qinv = { q.w, -q.x, -q.y, -q.z };
+    quaternion p = { 0.0f, a.x, a.y, a.z };
+    quaternion qp = q * p;
+    quaternion result = qp * qinv;
 
     return { result.x, result.y, result.z };
 }

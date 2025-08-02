@@ -40,3 +40,4 @@ inline void draw_imgui(world& world, camera& camera)
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+

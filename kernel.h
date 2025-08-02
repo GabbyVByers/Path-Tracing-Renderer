@@ -81,7 +81,7 @@ __device__ inline vec3 calculate_incoming_light(ray ray, unsigned int& randomSta
 
 
     ray.origin = info.hit_location + (info.hit_normal * 0.001f);
-    ray.direction = world.light_direction + (randomDirection(randomState) * 0.15f);
+    ray.direction = world.light_direction + (randomDirection(randomState) * 0.05f);
 
     hit_info shadowInfo = ray_spheres_intersection(ray, world);
 
@@ -100,8 +100,6 @@ __global__ inline void main_kernel(uchar4* pixels, int width, int height, world 
         return;
 
     unsigned int& random_state = world.device_hash_array[thread.index];
-
-    
 
     vec3 incoming_light = { 0.0f, 0.0f, 0.0f };
     ray ray = { camera.position, (camera.direction * camera.depth) + (camera.up * thread.v) + (camera.right * thread.u) };
