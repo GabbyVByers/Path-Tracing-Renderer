@@ -5,6 +5,36 @@
 #include "random.h"
 #include <cfloat>
 
+__device__ inline bool cheap_shadow_test(const Ray& ray, const World& world)
+{
+    for (int i = 0; i < world.num_spheres; i++)
+    {
+        Vec3 V = ray.origin - world.device_spheres[i].position;
+        float a = dot(ray.direction, ray.direction);
+        float b = 2.0f * dot(V, ray.direction);
+        float c = dot(V, V) - (world.device_spheres[i].radius * world.device_spheres[i].radius);
+
+        float discriminant = (b * b) - (4.0f * a * c);
+        if (discriminant <= 0.0f)
+        {
+            continue;
+        }
+
+        float t1 = ((-b) + sqrt(discriminant)) / (2.0f * a);
+        float t2 = ((-b) - sqrt(discriminant)) / (2.0f * a);
+        float t = fmin(t1, t2);
+
+        if (t <= 0.0f)
+        {
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 __device__ inline Hit_info ray_spheres_intersection(const Ray& ray, const World& world)
 {
     Hit_info info;
@@ -48,14 +78,28 @@ __device__ inline Hit_info ray_spheres_intersection(const Ray& ray, const World&
     return info;
 }
 
-__device__ inline Vec3 sky_brightness(const Ray& ray, const World& world)
+__device__ inline Vec3 hit_color_considering_DLS(const Hit_info& info, const World& world)
 {
-    float cos_weight = dot(ray.direction, world.light_direction);
+    Vec3 color = info.hit_color;
 
-    Vec3 brightness;
-    brightness = world.ambient_lighting + ((1.0f - world.ambient_lighting) * cos_weight);
+    float cos_weight = dot(info.hit_normal, world.light_direction);
 
-    return brightness;
+    if (cos_weight <= 0.0f)
+    {
+        cos_weight = 0.0f;
+    }
+
+    Ray ray;
+    ray.origin = info.hit_location;
+    ray.direction = world.light_direction;
+    if (cheap_shadow_test(ray, world))
+    {
+        cos_weight = 0.0f;
+    }
+
+    float dimming_factor = world.ambient_brightness + ((1.0f - world.ambient_brightness) * cos_weight);
+
+    return color * dimming_factor;
 }
 
 __device__ inline Vec3 skybox(const Ray& ray, const World& world)
@@ -81,39 +125,15 @@ __device__ inline Vec3 skybox(const Ray& ray, const World& world)
 
 __device__ inline Vec3 calculate_incoming_light(Ray ray, Thread& thread, const World& world)
 {
-    Hit_info initial_info = ray_spheres_intersection(ray, world);
-    Vec3 ray_color = initial_info.hit_color;
+    Hit_info info = ray_spheres_intersection(ray, world);
+    Vec3 ray_color = info.hit_color;
 
-
-    if (!initial_info.did_hit)
+    if (!info.did_hit)
     {
         return skybox(ray, world);
     }
 
-    ray.origin = initial_info.hit_location;
-    Vec3 diffuse_direction = random_hemisphere_direction(initial_info.hit_normal, *thread.hash_ptr);
-    Vec3 specular_direciton = reflect(ray.direction, initial_info.hit_normal);
-    ray.direction = lerp_between_vectors(specular_direciton, diffuse_direction, initial_info.hit_roughness);
-    normalize(ray.direction);
-
-    for (int i = 0; i < world.max_bounce_limit; i++)
-    {
-        Hit_info info = ray_spheres_intersection(ray, world);
-        
-        if (!info.did_hit)
-        {
-            return multiply(ray_color, sky_brightness(ray, world));
-        }
-
-        ray_color *= info.hit_color;
-        ray.origin = info.hit_location;
-        diffuse_direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr);
-        specular_direciton = reflect(ray.direction, info.hit_normal);
-        ray.direction = lerp_between_vectors(specular_direciton, diffuse_direction, info.hit_roughness);
-        normalize(ray.direction);
-    }
-
-    return ray_color * world.ambient_lighting;
+    return hit_color_considering_DLS(info, world);
 }
 
 __device__ inline void frame_accumulation(Vec3 new_color, const Thread& thread, World& world)

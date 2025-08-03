@@ -6,7 +6,7 @@ inline void process_keyboard_input(Opengl& opengl, World& world, Camera& camera)
 {
     Vec3 forward = { camera.direction.x, 0.0f, camera.direction.z };
     normalize(forward);
-    Vec3 right = camera.direction * camera.up;
+    Vec3 right = cross(camera.direction, camera.up);
     Vec3 up = { 0.0f, 1.0f, 0.0f };
 
     float slow = 1.0f;

@@ -38,9 +38,9 @@ inline void fix_camera(Camera& camera)
 {
     const Vec3 up = { 0.0f, 1.0f, 0.0f };
     normalize(camera.direction);
-    camera.right = camera.direction * up;
+    camera.right = cross(camera.direction, up);
     normalize(camera.right);
-    camera.up = camera.right * camera.direction;
+    camera.up = cross(camera.right, camera.direction);
     normalize(camera.up);
 }
 
@@ -51,7 +51,7 @@ struct World
     int height = 0;
     Vec3 light_direction = { 1.0f, 1.0f, 1.0f };
     float random_offset_magnitude = 0.1f;
-    float ambient_lighting = 0.3f;
+    float ambient_brightness = 0.33f;
     int max_bounce_limit = 10;
     int buffer_size = 0;
     int buffer_limit = 300;

@@ -30,9 +30,9 @@ struct Vec3
 	{
 		return
 		{
-			((y * vec.z) - (z * vec.y)),
-			((z * vec.x) - (x * vec.z)),
-			((x * vec.y) - (y * vec.x))
+			x * vec.x,
+			y * vec.y,
+			z * vec.z
 		};
 	}
 
@@ -113,6 +113,16 @@ struct Vec3
 	}
 };
 
+__host__ __device__ inline Vec3 cross(const Vec3& a, const Vec3& b)
+{
+	return
+	{
+		((a.y * b.z) - (a.z * b.y)),
+		((a.z * b.x) - (a.x * b.z)),
+		((a.x * b.y) - (a.y * b.x))
+	};
+}
+
 __host__ __device__ inline float dot(const Vec3& a, const Vec3& b)
 {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
@@ -122,16 +132,6 @@ __host__ __device__ inline void normalize(Vec3& vec)
 {
 	float length_sq = (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z);
 	vec /= sqrt(length_sq);
-}
-
-__host__ __device__ inline Vec3 multiply(const Vec3& a, const Vec3& b)
-{
-	return
-	{
-		a.x * b.x,
-		a.y * b.y,
-		a.z * b.z
-	};
 }
 
 __host__ __device__ inline Vec3 rgb(const unsigned char& r, const unsigned char& g, const unsigned char& b)
