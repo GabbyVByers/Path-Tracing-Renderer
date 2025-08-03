@@ -51,18 +51,29 @@ __device__ inline Vec3 hit_color_considering_shadow(const Hit_info& info, Thread
 {
     Ray ray;
     ray.origin = info.hit_location + (info.hit_normal * 0.001f);
-    ray.direction = world.light_direction + random_direction(*thread.hash_ptr) * world.light_direction_scalar;
+    ray.direction = world.light_direction + (random_direction(*thread.hash_ptr) * world.random_offset_magnitude);
+    normalize(ray.direction);
 
     Vec3 color = info.hit_color;
 
+    Vec3 noisy_normal = info.hit_normal + (random_direction(*thread.hash_ptr) * world.random_offset_magnitude);
+    normalize(noisy_normal);
+
+    float cos_weight = dot(noisy_normal, world.light_direction);
     Hit_info shadow_info = ray_spheres_intersection(ray, world);
+
+    if (cos_weight <= 0.0f)
+    {
+        cos_weight = 0.0f;
+    }
 
     if (shadow_info.did_hit)
     {
-        color = color * world.shadow_dimming_factor;
+        cos_weight = 0.0f;
     }
 
-    return color;
+    float real_dimming_factor = ((1.0f - world.shadow_dimming_factor) * cos_weight) + world.shadow_dimming_factor;
+    return color * real_dimming_factor;
 }
 
 __device__ inline Vec3 skybox(const Ray& ray, const World& world)
