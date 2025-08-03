@@ -148,9 +148,9 @@ __host__ __device__ inline Vec3 lerp_between_vectors(const Vec3& a, const Vec3& 
 {
 	return
 	{
-		(a.x * weight) + (b.x * (1.0f - weight)),
-		(a.y * weight) + (b.y * (1.0f - weight)),
-		(a.z * weight) + (b.z * (1.0f - weight))
+		(a.x * (1.0f - weight)) + (b.x * weight),
+		(a.y * (1.0f - weight)) + (b.y * weight),
+		(a.z * (1.0f - weight)) + (b.z * weight)
 	};
 }
 

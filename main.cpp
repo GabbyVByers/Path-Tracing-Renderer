@@ -12,18 +12,12 @@ int main()
 
     // Camera
     Camera camera;
-    camera.position  = { 11.3f, 8.0f, -10.0f };
-    camera.direction = { -0.5f, -0.5f, 0.7f };
-    camera.depth     = 2.0f;
     fix_camera(camera);
 
     // World
     World world;
-    world.max_bounce_limit = 1;
-    world.light_direction = { 1.0f, 1.0f, 1.0f };
     normalize(world.light_direction);
-    world.buffer_size = 0;
-    world.buffer_limit = 1000;
+
     unsigned int* hostHashArray = nullptr;
     hostHashArray = new unsigned int[screen_size(opengl)];
     for (int i = 0; i < screen_size(opengl); i++)
@@ -40,11 +34,11 @@ int main()
     world.num_spheres = 5;
     Sphere* host_spheres = nullptr;
     host_spheres = new Sphere[world.num_spheres];
-    host_spheres[0] = { {  0.0f, -90.0f,   0.0f }, 90.0f, { 1.0f, 1.0f, 1.0f}, 0.0f };
-    host_spheres[1] = { { -8.0f,   1.0f,   0.0f },  2.5f, { 0.2f, 0.2f, 1.0f}, 0.0f };
-    host_spheres[2] = { { -2.6f,   1.0f,   0.0f },  2.5f, { 1.0f, 0.2f, 0.2f}, 0.0f };
-    host_spheres[3] = { {  2.6f,   1.0f,   0.0f },  2.5f, { 0.2f, 1.0f, 0.2f}, 0.0f };
-    host_spheres[4] = { {  8.0f,   1.0f,   0.0f },  2.5f, { 1.0f, 0.2f, 1.0f}, 0.0f };
+    host_spheres[0] = { {  0.0f, -90.0f,   0.0f }, 90.0f, { 1.0f, 1.0f, 1.0f}, 0.3f };
+    host_spheres[1] = { { -8.0f,   1.0f,   0.0f },  2.5f, { 0.2f, 0.2f, 1.0f}, 1.0f };
+    host_spheres[2] = { { -2.6f,   1.0f,   0.0f },  2.5f, { 1.0f, 0.2f, 0.2f}, 1.0f };
+    host_spheres[3] = { {  2.6f,   1.0f,   0.0f },  2.5f, { 0.2f, 1.0f, 0.2f}, 1.0f };
+    host_spheres[4] = { {  8.0f,   1.0f,   0.0f },  2.5f, { 1.0f, 0.2f, 1.0f}, 1.0f };
     cudaMalloc((void**)&world.device_spheres, sizeof(Sphere) * world.num_spheres);
     cudaMemcpy(world.device_spheres, host_spheres, sizeof(Sphere) * world.num_spheres, cudaMemcpyHostToDevice);
 

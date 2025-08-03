@@ -27,11 +27,11 @@ struct Ray
 
 struct Camera
 {
-    Vec3 position;
-    Vec3 direction;
+    Vec3 position = { 11.3f, 8.0f, -10.0f };
+    Vec3 direction = { -0.5f, -0.5f, 0.7f };
     Vec3 up;
     Vec3 right;
-    float depth = 0.0f;
+    float depth = 2.0f;
 };
 
 inline void fix_camera(Camera& camera)
@@ -49,12 +49,12 @@ struct World
     uchar4* pixels = nullptr;
     int width = 0;
     int height = 0;
-    Vec3 light_direction;
+    Vec3 light_direction = { 1.0f, 1.0f, 1.0f };
     float random_offset_magnitude = 0.1f;
     float ambient_lighting = 0.3f;
-    int max_bounce_limit = 0;
+    int max_bounce_limit = 10;
     int buffer_size = 0;
-    int buffer_limit = 0;
+    int buffer_limit = 300;
     unsigned int* device_hash_array = nullptr;
     Vec3* accumulated_frame_buffer;
     Sphere* device_spheres = nullptr;
