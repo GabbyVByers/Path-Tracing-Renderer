@@ -51,7 +51,7 @@ struct World
     int height = 0;
     Vec3 light_direction;
     float random_offset_magnitude = 0.1f;
-    float shadow_dimming_factor = 0.33f;
+    float ambient_lighting = 0.3f;
     int max_bounce_limit = 0;
     int buffer_size = 0;
     int buffer_limit = 0;
