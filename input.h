@@ -2,13 +2,12 @@
 
 #include "opengl.h"
 
-inline void process_keyboard_input(opengl& opengl, world& world, camera& camera)
+inline void process_keyboard_input(Opengl& opengl, World& world, Camera& camera)
 {
-    world.buffer_size++;
-    vec3 forward = { camera.direction.x, 0.0f, camera.direction.z };
+    Vec3 forward = { camera.direction.x, 0.0f, camera.direction.z };
     normalize(forward);
-    vec3 right = camera.direction * camera.up;
-    vec3 up = { 0.0f, 1.0f, 0.0f };
+    Vec3 right = camera.direction * camera.up;
+    Vec3 up = { 0.0f, 1.0f, 0.0f };
 
     float slow = 1.0f;
     if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
@@ -53,7 +52,7 @@ inline void process_keyboard_input(opengl& opengl, world& world, camera& camera)
     }
 }
 
-inline void process_mouse_input(opengl& opengl, world& world, camera& camera)
+inline void process_mouse_input(Opengl& opengl, World& world, Camera& camera)
 {
     double curr_mouse_x;
     double curr_mouse_y;
@@ -62,7 +61,7 @@ inline void process_mouse_input(opengl& opengl, world& world, camera& camera)
     double mouse_rel_y = curr_mouse_y - opengl.prev_mouse_y;
     opengl.prev_mouse_x = curr_mouse_x;
     opengl.prev_mouse_y = curr_mouse_y;
-    vec3 up = { 0.0f, 1.0f, 0.0f };
+    Vec3 up = { 0.0f, 1.0f, 0.0f };
 
     ImGuiIO& io = ImGui::GetIO();
     if (io.WantCaptureMouse)
@@ -90,3 +89,14 @@ inline void process_mouse_input(opengl& opengl, world& world, camera& camera)
         world.buffer_size = 0;
     }
 }
+
+inline void process_keyboard_mouse_input(Opengl& opengl, World& world, Camera& camera)
+{
+    if (world.buffer_size < world.buffer_limit)
+    {
+        world.buffer_size++;
+    }
+    process_keyboard_input(opengl, world, camera);
+    process_mouse_input(opengl, world, camera);
+}
+

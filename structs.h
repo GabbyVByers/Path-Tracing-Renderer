@@ -2,40 +2,39 @@
 
 #include "vec3.h"
 
-struct sphere
+struct Sphere
 {
-    vec3 position;
-    float radius;
-    vec3 color;
+    Vec3 position;
+    float radius = 0.0f;
+    Vec3 color;
 };
 
-struct hit_info
+struct Hit_info
 {
-    bool did_hit;
-    bool did_hit_light_source;
-    vec3 hit_location;
-    vec3 hit_color;
-    vec3 hit_normal;
+    bool did_hit = false;
+    Vec3 hit_location;
+    Vec3 hit_color;
+    Vec3 hit_normal;
 };
 
-struct ray
+struct Ray
 {
-    vec3 origin;
-    vec3 direction;
+    Vec3 origin;
+    Vec3 direction;
 };
 
-struct camera
+struct Camera
 {
-    vec3 position;
-    vec3 direction;
-    vec3 up;
-    vec3 right;
-    float depth;
+    Vec3 position;
+    Vec3 direction;
+    Vec3 up;
+    Vec3 right;
+    float depth = 0.0f;
 };
 
-inline void fix_camera(camera& camera)
+inline void fix_camera(Camera& camera)
 {
-    const vec3 up = { 0.0f, 1.0f, 0.0f };
+    const Vec3 up = { 0.0f, 1.0f, 0.0f };
     normalize(camera.direction);
     camera.right = camera.direction * up;
     normalize(camera.right);
@@ -43,15 +42,20 @@ inline void fix_camera(camera& camera)
     normalize(camera.up);
 }
 
-struct world
+struct World
 {
-    vec3 light_direction;
-    int rays_per_pixel;
-    int buffer_size;
-    int buffer_limit;
-    unsigned int* device_hash_array;
-    vec3* device_true_frame_buffer;
-    sphere* device_spheres;
-    int num_spheres;
+    uchar4* pixels = nullptr;
+    int width = 0;
+    int height = 0;
+    Vec3 light_direction;
+    float light_direction_scalar = 0.05f;
+    float shadow_dimming_factor = 0.33f;
+    int max_bounce_limit = 0;
+    int buffer_size = 0;
+    int buffer_limit = 0;
+    unsigned int* device_hash_array = nullptr;
+    Vec3* accumulated_frame_buffer;
+    Sphere* device_spheres = nullptr;
+    int num_spheres = 0;
 };
 

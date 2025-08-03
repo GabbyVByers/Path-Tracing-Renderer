@@ -8,9 +8,9 @@ inline float random_float(float min, float max)
     return ((rand() / (float)RAND_MAX) * (max - min)) + min;
 }
 
-inline vec3 random_vec3(float min, float max)
+inline Vec3 random_vec3(float min, float max)
 {
-    return vec3
+    return Vec3
     {
         random_float(min, max),
         random_float(min, max),
@@ -41,13 +41,13 @@ __host__ __device__ inline float random_float_normal_distribution(unsigned int& 
     return sqrt(-2.0f * log(random_float_from_int(state))) * cos(theta);
 }
 
-__host__ __device__ inline vec3 random_hemisphere_direction(const vec3& normal, unsigned int& state)
+__host__ __device__ inline Vec3 random_hemisphere_direction(const Vec3& normal, unsigned int& state)
 {
     float rx = random_float_normal_distribution(state);
     float ry = random_float_normal_distribution(state);
     float rz = random_float_normal_distribution(state);
 
-    vec3 direction = { rx, ry, rz };
+    Vec3 direction = { rx, ry, rz };
     normalize(direction);
 
     if (dot(direction, normal) < 0.0f)
@@ -58,13 +58,13 @@ __host__ __device__ inline vec3 random_hemisphere_direction(const vec3& normal, 
     return direction;
 }
 
-__host__ __device__ inline vec3 randomDirection(unsigned int& state)
+__host__ __device__ inline Vec3 random_direction(unsigned int& state)
 {
     float rx = random_float_normal_distribution(state);
     float ry = random_float_normal_distribution(state);
     float rz = random_float_normal_distribution(state);
 
-    vec3 direction = { rx, ry, rz };
+    Vec3 direction = { rx, ry, rz };
 
     return direction;
 }

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "thread.h"
-
-struct vec3
+struct Vec3
 {
-	float x, y, z;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
 
-	__host__ __device__ vec3 operator + (const vec3& vec) const
+	__host__ __device__ Vec3 operator + (const Vec3& vec) const
 	{
 		return
 		{
@@ -16,7 +16,7 @@ struct vec3
 		};
 	}
 
-	__host__ __device__ vec3 operator - (const vec3& vec) const
+	__host__ __device__ Vec3 operator - (const Vec3& vec) const
 	{
 		return
 		{
@@ -26,7 +26,7 @@ struct vec3
 		};
 	}
 
-	__host__ __device__ vec3 operator * (const vec3& vec) const
+	__host__ __device__ Vec3 operator * (const Vec3& vec) const
 	{
 		return
 		{
@@ -36,7 +36,7 @@ struct vec3
 		};
 	}
 
-	__host__ __device__ vec3 operator * (const float& value) const
+	__host__ __device__ Vec3 operator * (const float& value) const
 	{
 		return
 		{
@@ -46,7 +46,7 @@ struct vec3
 		};
 	}
 
-	__host__ __device__ vec3 operator / (const float& value) const
+	__host__ __device__ Vec3 operator / (const float& value) const
 	{
 		return
 		{
@@ -56,7 +56,7 @@ struct vec3
 		};
 	}
 
-	__host__ __device__ vec3& operator += (const vec3& vec)
+	__host__ __device__ Vec3& operator += (const Vec3& vec)
 	{
 		x += vec.x;
 		y += vec.y;
@@ -64,7 +64,7 @@ struct vec3
 		return *this;
 	}
 
-	__host__ __device__ vec3& operator -= (const vec3& vec)
+	__host__ __device__ Vec3& operator -= (const Vec3& vec)
 	{
 		x -= vec.x;
 		y -= vec.y;
@@ -72,7 +72,7 @@ struct vec3
 		return *this;
 	}
 
-	__host__ __device__ vec3& operator *= (const vec3& vec)
+	__host__ __device__ Vec3& operator *= (const Vec3& vec)
 	{
 		x *= vec.x;
 		y *= vec.y;
@@ -80,7 +80,7 @@ struct vec3
 		return *this;
 	}
 
-	__host__ __device__ vec3& operator *= (const float& value)
+	__host__ __device__ Vec3& operator *= (const float& value)
 	{
 		x *= value;
 		y *= value;
@@ -88,7 +88,7 @@ struct vec3
 		return *this;
 	}
 
-	__host__ __device__ vec3& operator /= (const float& value)
+	__host__ __device__ Vec3& operator /= (const float& value)
 	{
 		x /= value;
 		y /= value;
@@ -96,7 +96,7 @@ struct vec3
 		return *this;
 	}
 
-	__host__ __device__ vec3& operator = (const float& value)
+	__host__ __device__ Vec3& operator = (const float& value)
 	{
 		x = value;
 		y = value;
@@ -104,7 +104,7 @@ struct vec3
 		return *this;
 	}
 
-	__host__ __device__ vec3& operator = (const vec3& vec)
+	__host__ __device__ Vec3& operator = (const Vec3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -113,18 +113,18 @@ struct vec3
 	}
 };
 
-__host__ __device__ inline float dot(const vec3& a, const vec3& b)
+__host__ __device__ inline float dot(const Vec3& a, const Vec3& b)
 {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
-__host__ __device__ inline void normalize(vec3& vec)
+__host__ __device__ inline void normalize(Vec3& vec)
 {
 	float length_sq = (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z);
 	vec /= sqrt(length_sq);
 }
 
-__host__ __device__ inline vec3 multiply(const vec3& a, const vec3& b)
+__host__ __device__ inline Vec3 multiply(const Vec3& a, const Vec3& b)
 {
 	return
 	{
@@ -134,7 +134,7 @@ __host__ __device__ inline vec3 multiply(const vec3& a, const vec3& b)
 	};
 }
 
-__host__ __device__ inline vec3 rgb(const unsigned char& r, const unsigned char& g, const unsigned char& b)
+__host__ __device__ inline Vec3 rgb(const unsigned char& r, const unsigned char& g, const unsigned char& b)
 {
 	return
 	{

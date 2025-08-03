@@ -12,22 +12,23 @@ inline void setup_imgui(GLFWwindow* window)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    float scale = 1.5f;
-    io.FontGlobalScale = scale;
-    ImGui::GetStyle().ScaleAllSizes(scale);
+    //float scale = 1.5f;
+    //io.FontGlobalScale = scale;
+    //ImGui::GetStyle().ScaleAllSizes(scale);
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-inline void draw_imgui(world& world, camera& camera)
+inline void draw_imgui(World& world, Camera& camera)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGui::Begin("Debugger");
-    ImGui::SliderInt("Buffer Limit", &world.buffer_limit, 0, 500);
-    ImGui::SliderInt("Rays Per Pixel", &world.rays_per_pixel, 0, 100);
+    ImGui::Text("Current Accumulation Buffer Size: %d", world.buffer_size);
+    ImGui::SliderInt("Frame Accumulation Buffer Limit", &world.buffer_limit, 1, 300);
+    ImGui::SliderInt("Recursive Bounce Limit", &world.max_bounce_limit, 0, 100);
     ImGui::SliderFloat("Light Source x:", &world.light_direction.x, -1.0f, 1.0f);
     ImGui::SliderFloat("Light Source y:", &world.light_direction.y, -1.0f, 1.0f);
     ImGui::SliderFloat("Light Source z:", &world.light_direction.z, -1.0f, 1.0f);

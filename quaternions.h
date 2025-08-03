@@ -18,7 +18,7 @@ struct quaternion
     }
 };
 
-inline vec3 rotate(const vec3& a, const vec3& b, const float& theta)
+inline Vec3 rotate(const Vec3& a, const Vec3& b, const float& theta)
 {
     float half = theta * 0.5f;
     float s = sin(half);

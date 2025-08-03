@@ -6,8 +6,9 @@
 #include <string>
 #include "gui.h"
 #include "quaternions.h"
+#include "kernel.h"
 
-struct opengl
+struct Opengl
 {
     int screen_width = 0;
     int screen_height = 0;
@@ -25,7 +26,7 @@ struct opengl
     double prev_mouse_y = 0.0f;
 };
 
-inline void setup_opengl(opengl& opengl, int screen_width, int screen_height, std::string title, bool full_screen)
+inline void setup_opengl(Opengl& opengl, int screen_width, int screen_height, std::string title, bool full_screen)
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -127,7 +128,7 @@ inline void setup_opengl(opengl& opengl, int screen_width, int screen_height, st
     return;
 }
 
-inline void free_opengl(opengl& opengl)
+inline void free_opengl(Opengl& opengl)
 {
     cudaGraphicsUnregisterResource(opengl.cuda_pbo);
     glDeleteBuffers(1, &opengl.pbo);
@@ -139,12 +140,20 @@ inline void free_opengl(opengl& opengl)
     glfwTerminate();
 }
 
-inline int screen_size(const opengl& opengl)
+inline void launch_cuda_kernel(Opengl& opengl, World& world, const Camera& camera)
 {
-    return opengl.screen_width * opengl.screen_height;
+    size_t size;
+    cudaGraphicsMapResources(1, &opengl.cuda_pbo, 0);
+    cudaGraphicsResourceGetMappedPointer((void**)&world.pixels, &size, opengl.cuda_pbo);
+
+    dim3 GRID = opengl.grid;
+    dim3 BLOCK = opengl.block;
+    world.width = opengl.screen_width;
+    world.height = opengl.screen_height;
+    main_kernel <<<GRID, BLOCK>>> (world, camera);
 }
 
-inline void render_screen(opengl& opengl, camera& cam)
+inline void render_screen(Opengl& opengl, Camera& cam)
 {
     cudaGraphicsUnmapResources(1, &opengl.cuda_pbo, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.pbo);
@@ -159,7 +168,7 @@ inline void render_screen(opengl& opengl, camera& cam)
     
 }
 
-inline void finish_rendering(opengl& opengl)
+inline void finish_rendering(Opengl& opengl)
 {
     glfwSwapBuffers(opengl.window);
     glfwPollEvents();
@@ -167,5 +176,10 @@ inline void finish_rendering(opengl& opengl)
     {
         glfwSetWindowShouldClose(opengl.window, true);
     }
+}
+
+inline int screen_size(const Opengl& opengl)
+{
+    return opengl.screen_width * opengl.screen_height;
 }
 

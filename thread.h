@@ -3,27 +3,27 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
-struct thread // TODO: give every struct default values, remove unnessasary struct initializations
+struct Thread
 {
     int index = -1;
-    int x = -1;
-    int y = -1;
     float u = 0.0f;
     float v = 0.0f;
+    unsigned int* hash_ptr = nullptr;
 };
 
-__device__ inline thread get_thread(const int& width, const int& height)
+__device__ inline Thread get_thread(const int& width, const int height, unsigned int* device_hash_array)
 {
-    thread thread;
-    thread.x = blockIdx.x * blockDim.x + threadIdx.x;
-    thread.y = blockIdx.y * blockDim.y + threadIdx.y;
+    Thread thread;
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
     thread.index = -1;
-    if ((thread.x < width) && (thread.y < height))
+    if ((x < width) && (y < height))
     {
-        thread.index = thread.y * width + thread.x;
+        thread.index = y * width + x;
     }
-    thread.u = ((thread.x / (float)width) * 2.0f - 1.0f) * (width / (float)height);
-    thread.v = (thread.y / (float)height) * 2.0f - 1.0f;
+    thread.u = ((x / (float)width) * 2.0f - 1.0f) * (width / (float)height);
+    thread.v = (y / (float)height) * 2.0f - 1.0f;
+    thread.hash_ptr = &device_hash_array[thread.index];
     return thread;
 }
 

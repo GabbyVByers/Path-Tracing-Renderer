@@ -5,14 +5,14 @@
 #include "random.h"
 #include <cfloat>
 
-__device__ inline hit_info ray_spheres_intersection(const ray& ray, const world& world)
+__device__ inline Hit_info ray_spheres_intersection(const Ray& ray, const World& world)
 {
-    hit_info info = { false };
+    Hit_info info;
     float closest_t = FLT_MAX;
     
     for (int i = 0; i < world.num_spheres; i++)
     {
-        vec3 V = ray.origin - world.device_spheres[i].position;
+        Vec3 V = ray.origin - world.device_spheres[i].position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
         float c = dot(V, V) - (world.device_spheres[i].radius * world.device_spheres[i].radius);
@@ -47,18 +47,38 @@ __device__ inline hit_info ray_spheres_intersection(const ray& ray, const world&
     return info;
 }
 
-__device__ inline vec3 sky_color(const vec3& direction, const vec3& light_direction)
+__device__ inline Vec3 hit_color_considering_shadow(const Hit_info& info, Thread& thread, const World& world)
 {
-    vec3 skyWhite    = rgb(255, 255, 255);
-    vec3 skyBlue     = rgb(57, 162, 237);
-    vec3 groundColor = rgb(143, 136, 130);
+    Ray ray;
+    ray.origin = info.hit_location + (info.hit_normal * 0.001f);
+    ray.direction = world.light_direction + random_direction(*thread.hash_ptr) * world.light_direction_scalar;
 
-    if (direction.y < 0.0f)
+    Vec3 color = info.hit_color;
+
+    Hit_info shadow_info = ray_spheres_intersection(ray, world);
+
+    if (shadow_info.did_hit)
+    {
+        color = color * world.shadow_dimming_factor;
+    }
+
+    return color;
+}
+
+__device__ inline Vec3 skybox(const Ray& ray, const World& world)
+{
+    Vec3 skyWhite    = rgb(255, 255, 255);
+    Vec3 skyBlue     = rgb(57, 162, 237);
+    Vec3 groundColor = rgb(143, 136, 130);
+
+    if (ray.direction.y < 0.0f)
     {
         return groundColor;
     }
 
-    if (dot(light_direction, direction) > 0.997f)
+    Vec3 dir = ray.direction;
+    normalize(dir);
+    if (dot(world.light_direction, dir) > 0.997f)
     {
         return skyWhite;
     }
@@ -66,66 +86,72 @@ __device__ inline vec3 sky_color(const vec3& direction, const vec3& light_direct
     return skyBlue;
 }
 
-__device__ inline vec3 calculate_incoming_light(ray ray, unsigned int& randomState, const world& world, const camera& camera)
+__device__ inline Vec3 calculate_incoming_light(Ray camera_ray, Thread& thread, const World& world)
 {
-    vec3 rayColor = { 1.0f, 1.0f, 1.0f };
+    Hit_info initial_hit_info = ray_spheres_intersection(camera_ray, world);
 
-    hit_info info = ray_spheres_intersection(ray, world);
-
-    if (!info.did_hit)
+    if (!initial_hit_info.did_hit)
     {
-        return sky_color(ray.direction, world.light_direction);
+        return skybox(camera_ray, world);
     }
 
-    rayColor *= info.hit_color;
+    Vec3 color = hit_color_considering_shadow(initial_hit_info, thread, world);
 
+    Ray ray;
+    ray.origin = initial_hit_info.hit_location;
+    ray.direction = random_hemisphere_direction(initial_hit_info.hit_normal, *thread.hash_ptr);
 
-    ray.origin = info.hit_location + (info.hit_normal * 0.001f);
-    ray.direction = world.light_direction + (randomDirection(randomState) * 0.05f);
-
-    hit_info shadowInfo = ray_spheres_intersection(ray, world);
-
-    if (shadowInfo.did_hit)
+    for (int i = 0; i < world.max_bounce_limit; i++)
     {
-        return multiply(rayColor, { 0.3f, 0.3f, 0.3f });
+        Hit_info info = ray_spheres_intersection(ray, world);
+
+        if (!info.did_hit)
+        {
+            break;
+        }
+
+        Vec3 next_color = hit_color_considering_shadow(info, thread, world);
+
+        color = (color * (float)(i + 1)) + next_color;
+        color /= (float)(i + 2);
+
+        ray.origin = info.hit_location;
+        ray.direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr);
     }
 
-    return rayColor;
+    return color;
 }
 
-__global__ inline void main_kernel(uchar4* pixels, int width, int height, world world, camera camera)
+__device__ inline void frame_accumulation(Vec3 new_color, const Thread& thread, World& world)
 {
-    thread thread = get_thread(width, height);
-    if (thread.index == -1)
-        return;
-
-    unsigned int& random_state = world.device_hash_array[thread.index];
-
-    vec3 incoming_light = { 0.0f, 0.0f, 0.0f };
-    ray ray = { camera.position, (camera.direction * camera.depth) + (camera.up * thread.v) + (camera.right * thread.u) };
-    normalize(ray.direction);
-    for (int i = 0; i < world.rays_per_pixel; i++)
-    {
-        incoming_light += calculate_incoming_light(ray, random_state, world, camera);
-    }
-    incoming_light /= world.rays_per_pixel;
-
-    if (world.buffer_size > world.buffer_limit)
+    if (world.buffer_size >= world.buffer_limit)
     {
         return;
     }
 
-    vec3 new_color = incoming_light;
-    vec3 curr_color = world.device_true_frame_buffer[thread.index];
-    vec3 average_color = (curr_color * (float)world.buffer_size + new_color) / ((float)world.buffer_size + 1.0f);
+    Vec3 curr_color = world.accumulated_frame_buffer[thread.index];
+    Vec3 average_color = (curr_color * (float)world.buffer_size + new_color) / ((float)world.buffer_size + 1.0f);
 
-    world.device_true_frame_buffer[thread.index] = average_color;
+    world.accumulated_frame_buffer[thread.index] = average_color;
 
     unsigned char r = average_color.x * 255.0f;
     unsigned char g = average_color.y * 255.0f;
     unsigned char b = average_color.z * 255.0f;
-    pixels[thread.index] = make_uchar4(r, g, b, 255);
+    world.pixels[thread.index] = make_uchar4(r, g, b, 255);
+}
 
+__global__ inline void main_kernel(World world, Camera camera)
+{
+    Thread thread = get_thread(world.width, world.height, world.device_hash_array);
+    if (thread.index == -1)
+        return;
+
+    Ray ray;
+    ray.origin = camera.position;
+    ray.direction = camera.direction + (camera.right * thread.u) + (camera.up * thread.v);
+
+    Vec3 color = calculate_incoming_light(ray, thread, world);
+    frame_accumulation(color, thread, world);
     return;
 }
 
