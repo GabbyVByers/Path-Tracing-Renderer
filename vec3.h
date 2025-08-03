@@ -144,3 +144,18 @@ __host__ __device__ inline Vec3 rgb(const unsigned char& r, const unsigned char&
 	};
 }
 
+__host__ __device__ inline Vec3 lerp_between_vectors(const Vec3& a, const Vec3& b, float weight)
+{
+	return
+	{
+		(a.x * weight) + (b.x * (1.0f - weight)),
+		(a.y * weight) + (b.y * (1.0f - weight)),
+		(a.z * weight) + (b.z * (1.0f - weight))
+	};
+}
+
+__host__ __device__ inline Vec3 reflect(const Vec3& a, const Vec3& n)
+{
+	float s = 2.0f * dot(a, n);
+	return a - (n * s);
+}

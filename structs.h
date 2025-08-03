@@ -7,6 +7,7 @@ struct Sphere
     Vec3 position;
     float radius = 0.0f;
     Vec3 color;
+    float roughness = 1.0f;
 };
 
 struct Hit_info
@@ -15,6 +16,7 @@ struct Hit_info
     Vec3 hit_location;
     Vec3 hit_color;
     Vec3 hit_normal;
+    float hit_roughness;
 };
 
 struct Ray
