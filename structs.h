@@ -50,11 +50,10 @@ struct World
     int width = 0;
     int height = 0;
     Vec3 light_direction = { 1.0f, 1.0f, 1.0f };
-    float random_offset_magnitude = 0.1f;
+    float sun_intensity = 10.0f;
     float ambient_brightness = 0.33f;
     int max_bounce_limit = 10;
     int buffer_size = 0;
-    int buffer_limit = 300;
     unsigned int* device_hash_array = nullptr;
     Vec3* accumulated_frame_buffer;
     Sphere* device_spheres = nullptr;

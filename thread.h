@@ -6,6 +6,8 @@
 struct Thread
 {
     int index = -1;
+    int screen_width = 0;
+    int screen_height = 0;
     float u = 0.0f;
     float v = 0.0f;
     unsigned int* hash_ptr = nullptr;
@@ -21,9 +23,17 @@ __device__ inline Thread get_thread(const int& width, const int height, unsigned
     {
         thread.index = y * width + x;
     }
+    thread.screen_width = width;
+    thread.screen_height = height;
     thread.u = ((x / (float)width) * 2.0f - 1.0f) * (width / (float)height);
     thread.v = (y / (float)height) * 2.0f - 1.0f;
     thread.hash_ptr = &device_hash_array[thread.index];
     return thread;
 }
 
+__device__ inline float smoothstep(float a, float b, float x)
+{
+    x = fmaxf(a, fminf(x, b));
+    float t = (x - a) / (b - a);
+    return t * t * (3.0f - 2.0f * t);
+}

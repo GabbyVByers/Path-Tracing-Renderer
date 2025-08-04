@@ -92,10 +92,7 @@ inline void process_mouse_input(Opengl& opengl, World& world, Camera& camera)
 
 inline void process_keyboard_mouse_input(Opengl& opengl, World& world, Camera& camera)
 {
-    if (world.buffer_size < world.buffer_limit)
-    {
-        world.buffer_size++;
-    }
+    world.buffer_size++;
     process_keyboard_input(opengl, world, camera);
     process_mouse_input(opengl, world, camera);
 }

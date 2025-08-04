@@ -78,7 +78,7 @@ __device__ inline Hit_info ray_spheres_intersection(const Ray& ray, const World&
     return info;
 }
 
-__device__ inline Vec3 hit_color_considering_DLS(const Hit_info& info, const World& world)
+__device__ inline Vec3 lambertian_shading(const Hit_info& info, const World& world)
 {
     Vec3 color = info.hit_color;
 
@@ -102,55 +102,94 @@ __device__ inline Vec3 hit_color_considering_DLS(const Hit_info& info, const Wor
     return color * dimming_factor;
 }
 
-__device__ inline Vec3 skybox(const Ray& ray, const World& world)
+__device__ inline Vec3 environment_light(const Ray& ray, const World& world)
 {
-    Vec3 sky_white    = rgb(255, 255, 255);
-    Vec3 sky_blue     = rgb(57, 162, 237);
-    Vec3 ground_color = rgb(143, 136, 130);
+    Vec3 sun_color;
+    sun_color = world.sun_intensity;
+    Vec3 sky_zenith = rgb(47, 175, 222);
+    Vec3 sky_horizon = rgb(255, 255, 255);
+    Vec3 ground_color = rgb(130, 126, 122);
+
+    float horizon_zenith_gradient = pow(smoothstep(0.0f, 0.4f, ray.direction.y), 0.35);
+
+
+    float cosine_sun = dot(ray.direction, world.light_direction);
+
+    float sun_size = 0.05f;
+    float corona_width = 0.1f;
+
+    //float sun_mask = smoothstep(1.0f - sun_size - corona_width, 1.0 - sun_size, cosine_sun);
+    float true_sun_mask = 0.0f;
+    if (cosine_sun > (1.0f - sun_size))
+    {
+        true_sun_mask = 1.0f;
+    }
+
 
     if (ray.direction.y < 0.0f)
     {
         return ground_color;
     }
 
-    Vec3 dir = ray.direction;
-    normalize(dir);
-    if (dot(world.light_direction, dir) > 0.997f)
+    Vec3 sky_color = lerp_between_vectors(sky_horizon, sky_zenith, horizon_zenith_gradient) + (sun_color * true_sun_mask);
+    return sky_color;
+}
+
+__device__ inline Vec3 sky_light(const Ray& ray, const World& world)
+{
+    Vec3 white = rgb(255, 255, 255);
+    //Vec3 sky_blue = rgb();
+    //Vec3 ground_color = rgb();
+
+    if (dot(ray.direction, world.light_direction) > 0.9f)
     {
-        return sky_white;
+        return white * world.sun_intensity;
     }
     
-    return sky_blue;
+    return { 0.0f, 0.0f, 0.0f };
 }
 
 __device__ inline Vec3 calculate_incoming_light(Ray ray, Thread& thread, const World& world)
 {
-    Hit_info info = ray_spheres_intersection(ray, world);
-    Vec3 ray_color = info.hit_color;
+    Vec3 color, light;
+    color = 1.0f;
+    light = 0.0f;
 
-    if (!info.did_hit)
+    Ray camera_ray = ray;
+
+    for (int i = 0; i < world.max_bounce_limit; i++)
     {
-        return skybox(ray, world);
+        Hit_info info = ray_spheres_intersection(ray, world);
+
+        if (!info.did_hit)
+        {
+            light = environment_light(ray, world);
+            break;
+        }
+
+        color = color * info.hit_color;
+
+        ray.origin = info.hit_location;
+        ray.direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr) + random_direction(*thread.hash_ptr);
+        normalize(ray.direction);
     }
 
-    return hit_color_considering_DLS(info, world);
+    return color * light;
 }
 
 __device__ inline void frame_accumulation(Vec3 new_color, const Thread& thread, World& world)
 {
-    if (world.buffer_size >= world.buffer_limit)
-    {
-        return;
-    }
+    Vec3& accumulated_color = world.accumulated_frame_buffer[thread.index];
+    
+    if (world.buffer_size == 0)
+        accumulated_color = 0.0f;
 
-    Vec3 curr_color = world.accumulated_frame_buffer[thread.index];
-    Vec3 average_color = (curr_color * (float)world.buffer_size + new_color) / ((float)world.buffer_size + 1.0f);
+    accumulated_color += new_color;
+    Vec3 this_color = accumulated_color / (world.buffer_size + 1);
 
-    world.accumulated_frame_buffer[thread.index] = average_color;
-
-    unsigned char r = average_color.x * 255.0f;
-    unsigned char g = average_color.y * 255.0f;
-    unsigned char b = average_color.z * 255.0f;
+    unsigned char r = fmin(255.0f, this_color.x * 255.0f);
+    unsigned char g = fmin(255.0f, this_color.y * 255.0f);
+    unsigned char b = fmin(255.0f, this_color.z * 255.0f);
     world.pixels[thread.index] = make_uchar4(r, g, b, 255);
 }
 
@@ -163,6 +202,8 @@ __global__ inline void main_kernel(World world, Camera camera)
     Ray ray;
     ray.origin = camera.position;
     ray.direction = camera.direction + (camera.right * thread.u) + (camera.up * thread.v);
+    ray.direction += random_direction(*thread.hash_ptr) * 0.001f;
+    normalize(ray.direction);
 
     Vec3 color = calculate_incoming_light(ray, thread, world);
     frame_accumulation(color, thread, world);
