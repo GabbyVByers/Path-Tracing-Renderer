@@ -62,7 +62,7 @@ __device__ inline Vec3 calculate_incoming_light(Ray ray, Thread& thread, const W
 
     Ray camera_ray = ray;
 
-    for (int i = 0; i < world.max_bounce_limit; i++)
+    for (int i = 0; i < 50; i++)
     {
         Hit_info info = ray_spheres_intersection(ray, world);
 
@@ -75,8 +75,14 @@ __device__ inline Vec3 calculate_incoming_light(Ray ray, Thread& thread, const W
         color = color * info.hit_color;
 
         ray.origin = info.hit_location;
-        ray.direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr) + random_direction(*thread.hash_ptr);
+
+        Vec3 diffuse_direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr);
+        Vec3 specular_direction = reflect(ray.direction, info.hit_normal);
+
+        ray.direction = lerp_between_vectors(diffuse_direction, specular_direction, info.hit_roughness);
         normalize(ray.direction);
+
+        //ray.direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr) + random_direction(*thread.hash_ptr);
     }
 
     return color * light;

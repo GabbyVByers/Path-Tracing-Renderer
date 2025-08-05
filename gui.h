@@ -32,7 +32,6 @@ inline void draw_imgui(World& world, Camera& camera)
     ImGui::Text("Camera UP    x:%.2f, y:%.2f, z:%.2f", camera.up.x, camera.up.y, camera.up.z);
     ImGui::Text("Camera RIGHT x:%.2f, y:%.2f, z:%.2f", camera.right.x, camera.right.y, camera.right.z);
     ImGui::Text("Accumulated Frames: %d", world.num_accumulated_frames);
-    ImGui::SliderInt("Rec Lim", &world.max_bounce_limit, 0, 100);
     
     ImGui::Text(" ");
     ImGui::Text("SUN DIRECTION");

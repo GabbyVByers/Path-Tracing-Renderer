@@ -65,7 +65,6 @@ struct World
 
     Sky_parameters sky;
 
-    int max_bounce_limit = 50;
     int num_accumulated_frames = 0;
     unsigned int* device_hash_array = nullptr;
     Vec3* accumulated_frame_buffer;
