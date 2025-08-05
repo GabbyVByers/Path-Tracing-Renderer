@@ -43,7 +43,7 @@ inline void draw_imgui(World& world, Camera& camera)
     ImGui::Text(" ");
     ImGui::Text("SKY PARAMETERS");
     ImGui::SliderFloat("Sun Int", &world.sky.sun_intensity, 0.0f, 100.0f);
-    ImGui::SliderFloat("Sun Exp", &world.sky.sun_exponent, 0.8f, 1.0f);
+    ImGui::SliderFloat("Sun Exp", &world.sky.sun_exponent, 1.0f, 150.0f);
     ImGui::SliderFloat("Hor Exp", &world.sky.horizon_exponent, 0.0f, 1.0f);
 
     ImGui::End();
