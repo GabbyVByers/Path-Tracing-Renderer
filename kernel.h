@@ -46,21 +46,15 @@ __device__ inline Hit_info ray_spheres_intersection(const Ray& ray, const World&
 
 __device__ inline Vec3 environment_light(const Ray& ray, const World& world)
 {
+    float zenith_horizon_gradient = pow(smoothstep(0.0f, 0.5f, ray.direction.y), world.sky.horizon_exponent);
+    Vec3 color_sky = lerp_between_vectors(world.sky.color_zenith, world.sky.color_horizon, zenith_horizon_gradient);
+    float sun_mask = pow(fmaxf(0, dot(ray.direction, world.sky.sun_direction)), world.sky.sun_exponent);
+    color_sky = color_sky + ((world.sky.color_sun * sun_mask) * world.sky.sun_intensity);
     
-    
-    Vec3 sky_blue = rgb(55, 107, 171);
-    Vec3 ground_color = rgb(94, 91, 88);
-    
-    if (ray.direction.y < 0.0f)
-        return ground_color;
-    
-    if (dot(ray.direction, world.light_direction) > 0.85f)
-    {
-        Vec3 white = rgb(255, 255, 255);
-        return white * world.sun_intensity;
-    }
-    
-    return sky_blue;
+    float ground_sky_gradient = smoothstep(-0.01f, 0.0f, ray.direction.y);
+    Vec3 composite = lerp_between_vectors(world.sky.color_ground, color_sky, ground_sky_gradient);
+
+    return composite;
 }
 
 __device__ inline Vec3 calculate_incoming_light(Ray ray, Thread& thread, const World& world)
@@ -84,7 +78,7 @@ __device__ inline Vec3 calculate_incoming_light(Ray ray, Thread& thread, const W
         color = color * info.hit_color;
 
         ray.origin = info.hit_location;
-        ray.direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr) + random_direction(*thread.hash_ptr);
+        ray.direction = random_hemisphere_direction(info.hit_normal, *thread.hash_ptr);
         normalize(ray.direction);
     }
 

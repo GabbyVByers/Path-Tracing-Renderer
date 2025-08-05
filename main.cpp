@@ -6,7 +6,7 @@
 int main()
 {
     Opengl opengl;
-    const bool FULLSCREEN = false;
+    const bool FULLSCREEN = true;
     setup_opengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
     setup_imgui(opengl.window);
 
@@ -16,7 +16,7 @@ int main()
 
     // World
     World world;
-    normalize(world.light_direction);
+    normalize(world.sky.sun_direction);
 
     unsigned int* host_hash_array = nullptr;
     host_hash_array = new unsigned int[screen_size(opengl)];
