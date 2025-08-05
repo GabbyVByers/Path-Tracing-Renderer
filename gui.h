@@ -12,9 +12,9 @@ inline void setup_imgui(GLFWwindow* window)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    //float scale = 1.5f;
-    //io.FontGlobalScale = scale;
-    //ImGui::GetStyle().ScaleAllSizes(scale);
+    float scale = 2.0f;
+    io.FontGlobalScale = scale;
+    ImGui::GetStyle().ScaleAllSizes(scale);
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -25,18 +25,28 @@ inline void draw_imgui(World& world, Camera& camera)
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::Begin("Debugger");
+    
+    ImGui::Begin("DEBUGGER");
+    ImGui::Text("Camera POS   x:%.2f, y:%.2f, z:%.2f", camera.position.x, camera.position.y, camera.position.z);
+    ImGui::Text("Camera DIR   x:%.2f, y:%.2f, z:%.2f", camera.direction.x, camera.direction.y, camera.direction.z);
+    ImGui::Text("Camera UP    x:%.2f, y:%.2f, z:%.2f", camera.up.x, camera.up.y, camera.up.z);
+    ImGui::Text("Camera RIGHT x:%.2f, y:%.2f, z:%.2f", camera.right.x, camera.right.y, camera.right.z);
     ImGui::Text("Accumulated Frames: %d", world.num_accumulated_frames);
-    ImGui::SliderInt("Recursive Bounce Limit", &world.max_bounce_limit, 0, 100);
-    ImGui::SliderFloat("Light Source x:", &world.sky.sun_direction.x, -1.0f, 1.0f);
-    ImGui::SliderFloat("Light Source y:", &world.sky.sun_direction.y, -1.0f, 1.0f);
-    ImGui::SliderFloat("Light Source z:", &world.sky.sun_direction.z, -1.0f, 1.0f);
+    ImGui::SliderInt("Rec Lim", &world.max_bounce_limit, 0, 100);
+    
+    ImGui::Text(" ");
+    ImGui::Text("SUN DIRECTION");
+    ImGui::SliderFloat("Sun Dir.x", &world.sky.sun_direction.x, -1.0f, 1.0f);
+    ImGui::SliderFloat("Sun Dir.y", &world.sky.sun_direction.y, -1.0f, 1.0f);
+    ImGui::SliderFloat("Sun Dir.z", &world.sky.sun_direction.z, -1.0f, 1.0f);
     normalize(world.sky.sun_direction);
-    ImGui::Text("Camera Position x:%.2f, y:%.2f, z:%.2f", camera.position.x, camera.position.y, camera.position.z);
-    ImGui::Text("Camera Direction x:%.2f, y:%.2f, z:%.2f", camera.direction.x, camera.direction.y, camera.direction.z);
-    ImGui::Text("Camera Up x:%.2f, y:%.2f, z:%.2f", camera.up.x, camera.up.y, camera.up.z);
-    ImGui::Text("Camera Right x:%.2f, y:%.2f, z:%.2f", camera.right.x, camera.right.y, camera.right.z);
-    ImGui::SliderFloat("Sun Intensity:", &world.sky.sun_intensity, 0.0f, 100.0f);
+
+    ImGui::Text(" ");
+    ImGui::Text("SKY PARAMETERS");
+    ImGui::SliderFloat("Sun Int", &world.sky.sun_intensity, 0.0f, 100.0f);
+    ImGui::SliderFloat("Sun Exp", &world.sky.sun_exponent, 0.8f, 1.0f);
+    ImGui::SliderFloat("Hor Exp", &world.sky.horizon_exponent, 0.0f, 1.0f);
+
     ImGui::End();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

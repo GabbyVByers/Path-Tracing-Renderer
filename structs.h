@@ -44,11 +44,11 @@ inline void fix_camera(Camera& camera)
     normalize(camera.up);
 }
 
-struct Sky
+struct Sky_parameters
 {
     Vec3 sun_direction = { 1.0f, 1.0f, 1.0f };
-    float sun_intensity = 20.0f;
-    float sun_exponent = 100.0f;
+    float sun_intensity = 35.0f;
+    float sun_exponent = 75.0f;
     float horizon_exponent = 0.35f;
 
     Vec3 color_sun     = rgb(255, 255, 255);
@@ -63,9 +63,9 @@ struct World
     int width = 0;
     int height = 0;
 
-    Sky sky;
+    Sky_parameters sky;
 
-    int max_bounce_limit = 10;
+    int max_bounce_limit = 50;
     int num_accumulated_frames = 0;
     unsigned int* device_hash_array = nullptr;
     Vec3* accumulated_frame_buffer;

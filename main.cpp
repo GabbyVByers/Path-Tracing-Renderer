@@ -34,10 +34,10 @@ int main()
     world.num_spheres = 5;
     Sphere* host_spheres = nullptr;
     host_spheres = new Sphere[world.num_spheres];
-    host_spheres[0] = { {  0.0f, -90.0f,   0.0f }, 90.0f, rgb(33, 45, 255), 0.3f };
+    host_spheres[0] = { {  0.0f, -90.0f,   0.0f }, 89.0f, rgb(33, 45, 255), 0.3f };
     host_spheres[1] = { { -8.0f,   1.0f,   0.0f },  2.5f, rgb(33, 255, 89), 1.0f };
-    host_spheres[2] = { { -2.6f,   1.0f,   0.0f },  2.5f, rgb(255, 55, 67), 1.0f };
-    host_spheres[3] = { {  2.6f,   1.0f,   0.0f },  2.5f, rgb(255, 67, 201), 1.0f };
+    host_spheres[2] = { { -2.6f,   1.0f,   0.0f },  2.5f, rgb(255, 67, 201), 1.0f };
+    host_spheres[3] = { {  2.6f,   1.0f,   0.0f },  2.5f, rgb(255, 55, 67), 1.0f };
     host_spheres[4] = { {  8.0f,   1.0f,   0.0f },  2.5f, rgb(255, 255, 255), 1.0f };
     cudaMalloc((void**)&world.device_spheres, sizeof(Sphere) * world.num_spheres);
     cudaMemcpy(world.device_spheres, host_spheres, sizeof(Sphere) * world.num_spheres, cudaMemcpyHostToDevice);
