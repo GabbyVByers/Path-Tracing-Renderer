@@ -26,7 +26,7 @@ inline void draw_imgui(World& world, Camera& camera)
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     ImGui::Begin("Debugger");
-    ImGui::Text("Current Accumulation Buffer Size: %d", world.buffer_size);
+    ImGui::Text("Accumulated Frames: %d", world.num_accumulated_frames);
     ImGui::SliderInt("Recursive Bounce Limit", &world.max_bounce_limit, 0, 100);
     ImGui::SliderFloat("Light Source x:", &world.light_direction.x, -1.0f, 1.0f);
     ImGui::SliderFloat("Light Source y:", &world.light_direction.y, -1.0f, 1.0f);

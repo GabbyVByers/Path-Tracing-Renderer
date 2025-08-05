@@ -16,18 +16,14 @@ __device__ inline bool cheap_shadow_test(const Ray& ray, const World& world)
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
-        {
             continue;
-        }
 
         float t1 = ((-b) + sqrt(discriminant)) / (2.0f * a);
         float t2 = ((-b) - sqrt(discriminant)) / (2.0f * a);
         float t = fmin(t1, t2);
 
         if (t <= 0.0f)
-        {
             continue;
-        }
 
         return true;
     }
@@ -49,18 +45,14 @@ __device__ inline Hit_info ray_spheres_intersection(const Ray& ray, const World&
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
-        {
             continue;
-        }
 
         float t1 = ((-b) + sqrt(discriminant)) / (2.0f * a);
         float t2 = ((-b) - sqrt(discriminant)) / (2.0f * a);
         float t = fmin(t1, t2);
 
         if (t <= 0.0f)
-        {
             continue;
-        }
 
         info.did_hit = true;
         
@@ -85,17 +77,14 @@ __device__ inline Vec3 lambertian_shading(const Hit_info& info, const World& wor
     float cos_weight = dot(info.hit_normal, world.light_direction);
 
     if (cos_weight <= 0.0f)
-    {
         cos_weight = 0.0f;
-    }
 
     Ray ray;
     ray.origin = info.hit_location;
     ray.direction = world.light_direction;
+
     if (cheap_shadow_test(ray, world))
-    {
         cos_weight = 0.0f;
-    }
 
     float dimming_factor = world.ambient_brightness + ((1.0f - world.ambient_brightness) * cos_weight);
 
@@ -118,18 +107,13 @@ __device__ inline Vec3 environment_light(const Ray& ray, const World& world)
     float sun_size = 0.05f;
     float corona_width = 0.1f;
 
-    //float sun_mask = smoothstep(1.0f - sun_size - corona_width, 1.0 - sun_size, cosine_sun);
     float true_sun_mask = 0.0f;
     if (cosine_sun > (1.0f - sun_size))
-    {
         true_sun_mask = 1.0f;
-    }
 
 
     if (ray.direction.y < 0.0f)
-    {
         return ground_color;
-    }
 
     Vec3 sky_color = lerp_between_vectors(sky_horizon, sky_zenith, horizon_zenith_gradient) + (sun_color * true_sun_mask);
     return sky_color;
@@ -181,11 +165,11 @@ __device__ inline void frame_accumulation(Vec3 new_color, const Thread& thread, 
 {
     Vec3& accumulated_color = world.accumulated_frame_buffer[thread.index];
     
-    if (world.buffer_size == 0)
+    if (world.num_accumulated_frames == 0)
         accumulated_color = 0.0f;
 
     accumulated_color += new_color;
-    Vec3 this_color = accumulated_color / (world.buffer_size + 1);
+    Vec3 this_color = accumulated_color / (world.num_accumulated_frames + 1);
 
     unsigned char r = fmin(255.0f, this_color.x * 255.0f);
     unsigned char g = fmin(255.0f, this_color.y * 255.0f);

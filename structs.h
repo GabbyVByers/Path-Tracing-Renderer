@@ -53,7 +53,7 @@ struct World
     float sun_intensity = 10.0f;
     float ambient_brightness = 0.33f;
     int max_bounce_limit = 10;
-    int buffer_size = 0;
+    int num_accumulated_frames = 0;
     unsigned int* device_hash_array = nullptr;
     Vec3* accumulated_frame_buffer;
     Sphere* device_spheres = nullptr;

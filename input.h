@@ -18,37 +18,37 @@ inline void process_keyboard_input(Opengl& opengl, World& world, Camera& camera)
     if (glfwGetKey(opengl.window, GLFW_KEY_W) == GLFW_PRESS)
     {
         camera.position += forward * slow;
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_S) == GLFW_PRESS)
     {
         camera.position -= forward * slow;
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_D) == GLFW_PRESS)
     {
         camera.position += right * slow;
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_A) == GLFW_PRESS)
     {
         camera.position -= right * slow;
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
         camera.position += up * slow;
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
         camera.position -= up * slow;
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 }
 
@@ -66,7 +66,7 @@ inline void process_mouse_input(Opengl& opengl, World& world, Camera& camera)
     ImGuiIO& io = ImGui::GetIO();
     if (io.WantCaptureMouse)
     {
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
         return;
     }
 
@@ -79,20 +79,20 @@ inline void process_mouse_input(Opengl& opengl, World& world, Camera& camera)
     {
         camera.direction = rotate(camera.direction, up, 0.005f * -mouse_rel_x);
         fix_camera(camera);
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 
     if (mouse_rel_y != 0.0f)
     {
         camera.direction = rotate(camera.direction, camera.right, 0.005f * -mouse_rel_y);
         fix_camera(camera);
-        world.buffer_size = 0;
+        world.num_accumulated_frames = 0;
     }
 }
 
 inline void process_keyboard_mouse_input(Opengl& opengl, World& world, Camera& camera)
 {
-    world.buffer_size++;
+    world.num_accumulated_frames++;
     process_keyboard_input(opengl, world, camera);
     process_mouse_input(opengl, world, camera);
 }

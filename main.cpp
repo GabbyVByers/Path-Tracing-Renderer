@@ -18,16 +18,16 @@ int main()
     World world;
     normalize(world.light_direction);
 
-    unsigned int* hostHashArray = nullptr;
-    hostHashArray = new unsigned int[screen_size(opengl)];
+    unsigned int* host_hash_array = nullptr;
+    host_hash_array = new unsigned int[screen_size(opengl)];
     for (int i = 0; i < screen_size(opengl); i++)
     {
         unsigned int hash = i;
         hash_uint32(hash);
-        hostHashArray[i] = hash;
+        host_hash_array[i] = hash;
     }
     cudaMalloc((void**)&world.device_hash_array, sizeof(unsigned int) * screen_size(opengl));
-    cudaMemcpy(world.device_hash_array, hostHashArray, sizeof(unsigned int) * screen_size(opengl), cudaMemcpyHostToDevice);
+    cudaMemcpy(world.device_hash_array, host_hash_array, sizeof(unsigned int) * screen_size(opengl), cudaMemcpyHostToDevice);
     cudaMalloc((void**)&world.accumulated_frame_buffer, sizeof(Vec3) * screen_size(opengl));
 
     // Spheres
