@@ -31,7 +31,7 @@ struct Camera
     Vec3 direction = { -0.5f, -0.5f, 0.7f };
     Vec3 up;
     Vec3 right;
-    float depth = 2.0f;
+    float depth = 1.5f;
 };
 
 inline void fix_camera(Camera& camera)

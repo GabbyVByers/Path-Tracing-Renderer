@@ -36,7 +36,7 @@ inline void draw_imgui(World& world, Camera& camera)
     ImGui::Text("Camera Direction x:%.2f, y:%.2f, z:%.2f", camera.direction.x, camera.direction.y, camera.direction.z);
     ImGui::Text("Camera Up x:%.2f, y:%.2f, z:%.2f", camera.up.x, camera.up.y, camera.up.z);
     ImGui::Text("Camera Right x:%.2f, y:%.2f, z:%.2f", camera.right.x, camera.right.y, camera.right.z);
-    ImGui::SliderFloat("Sun Intensity:", &world.sun_intensity, 0.0f, 20.0f);
+    ImGui::SliderFloat("Sun Intensity:", &world.sun_intensity, 0.0f, 100.0f);
     ImGui::End();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

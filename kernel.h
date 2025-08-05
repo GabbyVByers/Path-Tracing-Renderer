@@ -185,7 +185,7 @@ __global__ inline void main_kernel(World world, Camera camera)
 
     Ray ray;
     ray.origin = camera.position;
-    ray.direction = camera.direction + (camera.right * thread.u) + (camera.up * thread.v);
+    ray.direction = (camera.direction * camera.depth) + (camera.right * thread.u) + (camera.up * thread.v);
     ray.direction += random_direction(*thread.hash_ptr) * 0.001f;
     normalize(ray.direction);
 
