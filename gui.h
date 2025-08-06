@@ -22,8 +22,22 @@ inline void setup_imgui(GLFWwindow* window)
 
 inline void draw_imgui(World& world)
 {
+
+    Sphere* selected_host_sphere = nullptr;
+    int index_selected_sphere = -1;
+    for (int i = 0; i < world.spheres.num_spheres; i++)
+    {
+        if (world.spheres.host_spheres[i].is_selected == true)
+        {
+            selected_host_sphere = &world.spheres.host_spheres[i];
+            index_selected_sphere = i;
+            break;
+        }
+    }
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
+
     ImGui::NewFrame();
     
     ImGui::Begin("DEBUGGER");
@@ -46,7 +60,44 @@ inline void draw_imgui(World& world)
     ImGui::SliderFloat("Sun Exp", &world.sky.sun_exponent, 1.0f, 150.0f);
     ImGui::SliderFloat("Hor Exp", &world.sky.horizon_exponent, 0.0f, 1.0f);
 
+    if (selected_host_sphere != nullptr)
+    {
+        ImGui::Begin("Selected Sphere");
+
+        if (ImGui::Button("Deselect Sphere"))
+            selected_host_sphere->is_selected = false;
+
+        ImGui::SliderFloat("Roughness", &selected_host_sphere->roughness, 0.0f, 1.0f);
+        ImGui::SliderFloat("Radius", &selected_host_sphere->radius, 0.1f, 20.0f);
+        
+                           if (ImGui::Button("+X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 0.01f; }
+        ImGui::SameLine(); if (ImGui::Button("++X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("+++X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("---X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x -= 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("--X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x -= 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("-X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x -= 0.01f; }
+
+                           if (ImGui::Button("+Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y += 0.01f; }
+        ImGui::SameLine(); if (ImGui::Button("++Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y += 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("+++Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y += 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("---Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y -= 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("--Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y -= 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("-Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y -= 0.01f; }
+
+                           if (ImGui::Button("+Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z += 0.01f; }
+        ImGui::SameLine(); if (ImGui::Button("++Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z += 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("+++Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z += 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("---Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("--Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("-Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.01f; }
+        
+        ImGui::End();
+
+        update_spheres_on_gpu(world.spheres);
+    }
+
     ImGui::End();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

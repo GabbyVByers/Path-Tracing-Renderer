@@ -96,6 +96,7 @@
     <CudaCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="selector.h" />
     <CudaCompile Include="spheres.h" />
     <CudaCompile Include="input.h" />
     <CudaCompile Include="thread.h" />

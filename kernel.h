@@ -2,7 +2,6 @@
 
 #include "thread.h"
 #include "world.h"
-#include "utilities.h"
 #include <cfloat>
 
 struct Hit_info
