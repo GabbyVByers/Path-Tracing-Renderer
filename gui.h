@@ -61,9 +61,10 @@ inline void draw_imgui(World& world)
     ImGui::SliderFloat("Hor Exp", &world.sky.horizon_exponent, 0.0f, 1.0f);
 
     if (ImGui::Button("Save Spheres"))
-    {
         save_spheres(world);
-    }
+
+    if (ImGui::Button("Load Spheres"))
+        load_spheres(world);
 
     if (selected_host_sphere != nullptr)
     {

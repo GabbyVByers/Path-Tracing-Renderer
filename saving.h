@@ -2,24 +2,15 @@
 
 #include "world.h"
 #include <fstream>
-
-struct Meta_data
-{
-	int num_spheres;
-};
+#include <iostream>
 
 inline void save_spheres(World& world)
 {
-	unsigned char* save_data = nullptr;
-
-	size_t size_bytes = sizeof(Meta_data) + (sizeof(Sphere) * world.spheres.num_spheres);
-
-	save_data = new unsigned char[size_bytes];
-
+	size_t size_bytes = sizeof(Sphere) * world.spheres.num_spheres;
+	unsigned char* save_data = new unsigned char[size_bytes];
 	memcpy(save_data, world.spheres.host_spheres, size_bytes);
 
 	std::ofstream out_file("save_file.bin", std::ios::binary);
-
 	if (out_file.is_open())
 	{
 		out_file.write(reinterpret_cast<const char*>(save_data), size_bytes);
@@ -29,7 +20,18 @@ inline void save_spheres(World& world)
 	delete[] save_data;
 }
 
-inline void load_spheres()
+inline void load_spheres(World& world)
 {
+	std::ifstream in_file("save_file.bin", std::ios::binary);
 
+	in_file.seekg(0, std::ios::end);
+	size_t size_bytes = in_file.tellg();
+	in_file.seekg(0, std::ios::beg);
+
+	char* save_data = new char[size_bytes];
+	in_file.read(save_data, size_bytes);
+
+	memcpy(world.spheres.host_spheres, save_data, size_bytes);
+	update_spheres_on_gpu(world.spheres);
 }
+
