@@ -1,7 +1,6 @@
 
 #include <iostream>
 #include "input.h"
-#include "random.h"
 
 int main()
 {
@@ -10,47 +9,22 @@ int main()
     setup_opengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
     setup_imgui(opengl.window);
 
-    // Camera
-    Camera camera;
-    fix_camera(camera);
-
-    // World
     World world;
-    normalize(world.sky.sun_direction);
-
-    unsigned int* host_hash_array = nullptr;
-    host_hash_array = new unsigned int[screen_size(opengl)];
-    for (int i = 0; i < screen_size(opengl); i++)
-    {
-        unsigned int hash = i;
-        hash_uint32(hash);
-        host_hash_array[i] = hash;
-    }
-    cudaMalloc((void**)&world.device_hash_array, sizeof(unsigned int) * screen_size(opengl));
-    cudaMemcpy(world.device_hash_array, host_hash_array, sizeof(unsigned int) * screen_size(opengl), cudaMemcpyHostToDevice);
-    cudaMalloc((void**)&world.accumulated_frame_buffer, sizeof(Vec3) * screen_size(opengl));
-
-    // Spheres
-    world.num_spheres = 5;
-    Sphere* host_spheres = nullptr;
-    host_spheres = new Sphere[world.num_spheres];
-    host_spheres[0] = { {  0.0f, -90.0f,   0.0f }, 89.0f, rgb( 33,  45, 255), 0.0f };
-    host_spheres[1] = { { -8.0f,   1.0f,   0.0f },  2.5f, rgb( 33, 255,  89), 1.0f };
-    host_spheres[2] = { { -2.6f,   1.0f,   0.0f },  2.5f, rgb(255,  67, 201), 0.0f };
-    host_spheres[3] = { {  2.6f,   1.0f,   0.0f },  2.5f, rgb(255,   0,   0), 0.0f };
-    host_spheres[4] = { {  8.0f,   1.0f,   0.0f },  2.5f, rgb(255, 255, 255), 0.5f };
-    cudaMalloc((void**)&world.device_spheres, sizeof(Sphere) * world.num_spheres);
-    cudaMemcpy(world.device_spheres, host_spheres, sizeof(Sphere) * world.num_spheres, cudaMemcpyHostToDevice);
+    fix_camera(world.camera);
+    build_hash_array_and_frame_buffer(world.buffer, screen_size(opengl));
+    initialize_spheres(world.spheres);
+    update_spheres_on_gpu(world.spheres);
 
     while (!glfwWindowShouldClose(opengl.window))
     {
-        launch_cuda_kernel(opengl, world, camera);
-        process_keyboard_mouse_input(opengl, world, camera);
-        render_screen(opengl, camera);
-        draw_imgui(world, camera);
+        launch_cuda_kernel(opengl, world);
+        process_keyboard_mouse_input(opengl, world);
+        render_screen(opengl);
+        draw_imgui(world);
         finish_rendering(opengl);
     }
 
+    free_spheres(world.spheres);
     free_opengl(opengl);
     return 0;
 }

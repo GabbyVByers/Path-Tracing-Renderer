@@ -96,9 +96,10 @@
     <CudaCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="spheres.h" />
     <CudaCompile Include="input.h" />
     <CudaCompile Include="thread.h" />
-    <CudaCompile Include="structs.h" />
+    <CudaCompile Include="world.h" />
     <CudaCompile Include="gui.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -112,7 +113,7 @@
     <CudaCompile Include="opengl.h" />
     <CudaCompile Include="kernel.h" />
     <CudaCompile Include="quaternions.h" />
-    <CudaCompile Include="random.h" />
+    <CudaCompile Include="utilities.h" />
     <CudaCompile Include="vec3.h" />
   </ItemGroup>
   <ItemGroup>

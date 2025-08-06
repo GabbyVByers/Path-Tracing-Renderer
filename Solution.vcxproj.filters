@@ -82,7 +82,7 @@
     <CudaCompile Include="Vec3.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="Random.h">
+    <CudaCompile Include="utilities.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="Quaternions.h">
@@ -94,7 +94,7 @@
     <CudaCompile Include="opengl.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="structs.h">
+    <CudaCompile Include="world.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="thread.h">
@@ -104,6 +104,9 @@
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="gui.h">
+      <Filter>Header Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="spheres.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
   </ItemGroup>

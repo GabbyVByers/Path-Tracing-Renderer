@@ -2,11 +2,11 @@
 
 #include "opengl.h"
 
-inline void process_keyboard_input(Opengl& opengl, World& world, Camera& camera)
+inline void process_keyboard_input(Opengl& opengl, World& world)
 {
-    Vec3 forward = { camera.direction.x, 0.0f, camera.direction.z };
+    Vec3 forward = { world.camera.direction.x, 0.0f, world.camera.direction.z };
     normalize(forward);
-    Vec3 right = cross(camera.direction, camera.up);
+    Vec3 right = cross(world.camera.direction, world.camera.up);
     Vec3 up = { 0.0f, 1.0f, 0.0f };
 
     float slow = 1.0f;
@@ -17,42 +17,42 @@ inline void process_keyboard_input(Opengl& opengl, World& world, Camera& camera)
 
     if (glfwGetKey(opengl.window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        camera.position += forward * slow;
-        world.num_accumulated_frames = 0;
+        world.camera.position += forward * slow;
+        world.buffer.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        camera.position -= forward * slow;
-        world.num_accumulated_frames = 0;
+        world.camera.position -= forward * slow;
+        world.buffer.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        camera.position += right * slow;
-        world.num_accumulated_frames = 0;
+        world.camera.position += right * slow;
+        world.buffer.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        camera.position -= right * slow;
-        world.num_accumulated_frames = 0;
+        world.camera.position -= right * slow;
+        world.buffer.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
-        camera.position += up * slow;
-        world.num_accumulated_frames = 0;
+        world.camera.position += up * slow;
+        world.buffer.num_accumulated_frames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-        camera.position -= up * slow;
-        world.num_accumulated_frames = 0;
+        world.camera.position -= up * slow;
+        world.buffer.num_accumulated_frames = 0;
     }
 }
 
-inline void process_mouse_input(Opengl& opengl, World& world, Camera& camera)
+inline void process_mouse_input(Opengl& opengl, World& world)
 {
     double curr_mouse_x;
     double curr_mouse_y;
@@ -66,7 +66,7 @@ inline void process_mouse_input(Opengl& opengl, World& world, Camera& camera)
     ImGuiIO& io = ImGui::GetIO();
     if (io.WantCaptureMouse)
     {
-        world.num_accumulated_frames = 0;
+        world.buffer.num_accumulated_frames = 0;
         return;
     }
 
@@ -77,23 +77,23 @@ inline void process_mouse_input(Opengl& opengl, World& world, Camera& camera)
 
     if (mouse_rel_x != 0.0f)
     {
-        camera.direction = rotate(camera.direction, up, 0.005f * -mouse_rel_x);
-        fix_camera(camera);
-        world.num_accumulated_frames = 0;
+        world.camera.direction = rotate(world.camera.direction, up, 0.005f * -mouse_rel_x);
+        fix_camera(world.camera);
+        world.buffer.num_accumulated_frames = 0;
     }
 
     if (mouse_rel_y != 0.0f)
     {
-        camera.direction = rotate(camera.direction, camera.right, 0.005f * -mouse_rel_y);
-        fix_camera(camera);
-        world.num_accumulated_frames = 0;
+        world.camera.direction = rotate(world.camera.direction, world.camera.right, 0.005f * -mouse_rel_y);
+        fix_camera(world.camera);
+        world.buffer.num_accumulated_frames = 0;
     }
 }
 
-inline void process_keyboard_mouse_input(Opengl& opengl, World& world, Camera& camera)
+inline void process_keyboard_mouse_input(Opengl& opengl, World& world)
 {
-    world.num_accumulated_frames++;
-    process_keyboard_input(opengl, world, camera);
-    process_mouse_input(opengl, world, camera);
+    world.buffer.num_accumulated_frames++;
+    process_keyboard_input(opengl, world);
+    process_mouse_input(opengl, world);
 }
 

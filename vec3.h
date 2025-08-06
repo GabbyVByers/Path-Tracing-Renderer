@@ -134,6 +134,12 @@ __host__ __device__ inline void normalize(Vec3& vec)
 	vec /= sqrt(length_sq);
 }
 
+__host__ __device__ inline Vec3 return_normalized(Vec3 vec)
+{
+	float length_sq = (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z);
+	return vec /= sqrt(length_sq);
+}
+
 __host__ __device__ inline Vec3 rgb(const unsigned char& r, const unsigned char& g, const unsigned char& b)
 {
 	return
@@ -144,7 +150,7 @@ __host__ __device__ inline Vec3 rgb(const unsigned char& r, const unsigned char&
 	};
 }
 
-__host__ __device__ inline Vec3 lerp_between_vectors(const Vec3& a, const Vec3& b, float weight)
+__host__ __device__ inline Vec3 lerp_vec3(const Vec3& a, const Vec3& b, float weight)
 {
 	return
 	{

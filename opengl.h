@@ -140,7 +140,7 @@ inline void free_opengl(Opengl& opengl)
     glfwTerminate();
 }
 
-inline void launch_cuda_kernel(Opengl& opengl, World& world, const Camera& camera)
+inline void launch_cuda_kernel(Opengl& opengl, World& world)
 {
     size_t size;
     cudaGraphicsMapResources(1, &opengl.cuda_pbo, 0);
@@ -148,12 +148,12 @@ inline void launch_cuda_kernel(Opengl& opengl, World& world, const Camera& camer
 
     dim3 GRID = opengl.grid;
     dim3 BLOCK = opengl.block;
-    world.width = opengl.screen_width;
-    world.height = opengl.screen_height;
-    main_kernel <<<GRID, BLOCK>>> (world, camera);
+    world.screen_width = opengl.screen_width;
+    world.screen_height = opengl.screen_height;
+    main_kernel <<<GRID, BLOCK>>> (world);
 }
 
-inline void render_screen(Opengl& opengl, Camera& cam)
+inline void render_screen(Opengl& opengl)
 {
     cudaGraphicsUnmapResources(1, &opengl.cuda_pbo, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.pbo);
@@ -165,7 +165,6 @@ inline void render_screen(Opengl& opengl, Camera& cam)
     glBindVertexArray(opengl.quad_vao);
     glBindTexture(GL_TEXTURE_2D, opengl.texture_id);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    
 }
 
 inline void finish_rendering(Opengl& opengl)
