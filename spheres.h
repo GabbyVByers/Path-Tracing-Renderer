@@ -27,7 +27,7 @@ inline void initialize_spheres(Spheres& spheres)
     spheres.host_spheres[1] = { { -8.0f,   1.0f,   0.0f },  2.5f, rgb( 33, 255,  89), 1.0f, false };
     spheres.host_spheres[2] = { { -2.6f,   1.0f,   0.0f },  2.5f, rgb(255,  67, 201), 0.0f, false };
     spheres.host_spheres[3] = { {  2.6f,   1.0f,   0.0f },  2.5f, rgb(255,   0,   0), 0.0f, false };
-    spheres.host_spheres[4] = { {  8.0f,   1.0f,   0.0f },  2.5f, rgb(255, 255, 255), 1.0f, true };
+    spheres.host_spheres[4] = { {  8.0f,   1.0f,   0.0f },  2.5f, rgb(255, 255, 255), 1.0f, false };
     cudaMalloc((void**)&spheres.device_spheres, sizeof(Sphere) * spheres.num_spheres);
 }
 

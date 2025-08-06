@@ -15,8 +15,8 @@ struct Camera
 struct Sky
 {
     Vec3 sun_direction = return_normalized({ 1.0f, 1.0f, 1.0f });
-    float sun_intensity = 35.0f;
-    float sun_exponent = 75.0f;
+    float sun_intensity = 20.0f;
+    float sun_exponent = 50.0f;
     float horizon_exponent = 0.35f;
 
     Vec3 color_sun     = rgb(255, 255, 255);

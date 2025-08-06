@@ -1,7 +1,6 @@
 #pragma once
 
 #include "opengl.h"
-#include <iostream>
 
 inline int mouse_spheres_intersection(const Ray& ray, const World& world)
 {

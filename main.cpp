@@ -16,7 +16,7 @@ Delete Sphere.
 int main()
 {
     Opengl opengl;
-    const bool FULLSCREEN = true;
+    const bool FULLSCREEN = false;
     setup_opengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
     setup_imgui(opengl.window);
 

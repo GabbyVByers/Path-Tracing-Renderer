@@ -5,7 +5,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "world.h"
+#include "saving.h"
 
 inline void setup_imgui(GLFWwindow* window)
 {
@@ -59,6 +59,11 @@ inline void draw_imgui(World& world)
     ImGui::SliderFloat("Sun Int", &world.sky.sun_intensity, 0.0f, 100.0f);
     ImGui::SliderFloat("Sun Exp", &world.sky.sun_exponent, 1.0f, 150.0f);
     ImGui::SliderFloat("Hor Exp", &world.sky.horizon_exponent, 0.0f, 1.0f);
+
+    if (ImGui::Button("Save Spheres"))
+    {
+        save_spheres(world);
+    }
 
     if (selected_host_sphere != nullptr)
     {
