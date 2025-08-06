@@ -91,6 +91,8 @@ inline void draw_imgui(World& world)
         ImGui::SameLine(); if (ImGui::Button("--Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.1f;  }
         ImGui::SameLine(); if (ImGui::Button("-Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.01f; }
         
+        ImGui::ColorEdit3("Change Color", (float*)&selected_host_sphere->color);
+
         ImGui::End();
 
         update_spheres_on_gpu(world.spheres);

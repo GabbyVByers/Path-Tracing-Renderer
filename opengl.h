@@ -8,6 +8,8 @@
 #include "quaternions.h"
 #include "kernel.h"
 
+#include <iostream>
+
 struct Opengl
 {
     int screen_width = 0;

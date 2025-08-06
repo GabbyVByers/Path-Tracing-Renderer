@@ -1,12 +1,13 @@
 
 #include <iostream>
 #include "input.h"
+#include "selector.h"
 
 /*
 
 TODO
 
-Select & Edit Sphere.
+Select & Edit Sphere. DONE! :333
 Add Sphere.
 Delete Sphere.
 
@@ -27,6 +28,7 @@ int main()
 
     while (!glfwWindowShouldClose(opengl.window))
     {
+        select_sphere(opengl, world);
         launch_cuda_kernel(opengl, world);
         process_keyboard_mouse_input(opengl, world);
         render_screen(opengl);
