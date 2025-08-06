@@ -2,6 +2,16 @@
 #include <iostream>
 #include "input.h"
 
+/*
+
+TODO
+
+Select & Edit Sphere.
+Add Sphere.
+Delete Sphere.
+
+*/
+
 int main()
 {
     Opengl opengl;

@@ -31,9 +31,3 @@ __device__ inline Thread get_thread(const int& width, const int height, unsigned
     return thread;
 }
 
-__device__ inline float smoothstep(float a, float b, float x)
-{
-    x = fmaxf(a, fminf(x, b));
-    float t = (x - a) / (b - a);
-    return t * t * (3.0f - 2.0f * t);
-}

@@ -69,3 +69,9 @@ __host__ __device__ inline Vec3 random_direction(unsigned int& state)
     return direction;
 }
 
+__device__ inline float smoothstep(float a, float b, float x)
+{
+    x = fmaxf(a, fminf(x, b));
+    float t = (x - a) / (b - a);
+    return t * t * (3.0f - 2.0f * t);
+}
