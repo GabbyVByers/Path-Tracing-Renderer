@@ -2,14 +2,18 @@
 
 #include "world.h"
 #include <fstream>
+#include <string>
 
-inline void save_spheres(World& world)
+inline void save_spheres(World& world, char file_name[24])
 {
 	size_t size_bytes = sizeof(Sphere) * world.spheres.num_spheres;
 	unsigned char* save_data = new unsigned char[size_bytes];
 	memcpy(save_data, world.spheres.host_spheres, size_bytes);
 
-	std::ofstream out_file("save_file.bin", std::ios::binary);
+	std::string real_file_name(&file_name[0], sizeof(file_name));
+	real_file_name = "saves/" + real_file_name + ".bin";
+
+	std::ofstream out_file(real_file_name, std::ios::binary);
 	if (out_file.is_open())
 	{
 		out_file.write(reinterpret_cast<const char*>(save_data), size_bytes);
@@ -19,9 +23,14 @@ inline void save_spheres(World& world)
 	delete[] save_data;
 }
 
-inline void load_spheres(World& world)
+inline void load_spheres(World& world, char file_name[24])
 {
-	std::ifstream in_file("save_file.bin", std::ios::binary);
+	std::string real_file_name(file_name, sizeof(file_name));
+	real_file_name = "saves/" + real_file_name + ".bin";
+	std::ifstream in_file(real_file_name, std::ios::binary);
+
+	if (!in_file.is_open())
+		return;
 
 	in_file.seekg(0, std::ios::end);
 	size_t size_bytes = in_file.tellg();

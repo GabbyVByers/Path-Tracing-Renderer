@@ -10,7 +10,7 @@ struct Sphere
     float roughness = 1.0f;
     bool is_selected = false;
     bool is_light_source = false;
-    float light_intensity = 0.0f;
+    float light_intensity = 1.0f;
 };
 
 struct Spheres
@@ -33,14 +33,10 @@ inline void free_spheres(Spheres& spheres)
 
 inline void initialize_spheres(Spheres& spheres)
 {
-    spheres.num_spheres = 5;
+    spheres.num_spheres = 1;
     spheres.host_spheres = nullptr;
     spheres.host_spheres = new Sphere[spheres.num_spheres];
-    spheres.host_spheres[0] = { {  0.0f, -90.0f,   0.0f }, 89.0f, rgb(33,  45, 255), 0.0f, false };
-    spheres.host_spheres[1] = { { -8.0f,   1.0f,   0.0f },  2.5f, rgb(33, 255,  89), 1.0f, false };
-    spheres.host_spheres[2] = { { -2.6f,   1.0f,   0.0f },  2.5f, rgb(255,  67, 201), 0.0f, false };
-    spheres.host_spheres[3] = { {  2.6f,   1.0f,   0.0f },  2.5f, rgb(255,   0,   0), 0.0f, false };
-    spheres.host_spheres[4] = { {  8.0f,   1.0f,   0.0f },  2.5f, rgb(255, 255, 255), 1.0f, false };
+    spheres.host_spheres[0] = { { 0.0f, 0.0f, 0.0f }, 1.0f, rgb(255, 255, 255), 1.0f, false };
     cudaMalloc((void**)&spheres.device_spheres, sizeof(Sphere) * spheres.num_spheres);
     update_spheres_on_gpu(spheres);
 }
