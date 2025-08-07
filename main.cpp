@@ -3,20 +3,10 @@
 #include "input.h"
 #include "selector.h"
 
-/*
-
-TODO
-
-Select & Edit Sphere. DONE! :333
-Add Sphere.
-Delete Sphere.
-
-*/
-
 int main()
 {
     Opengl opengl;
-    const bool FULLSCREEN = false;
+    const bool FULLSCREEN = true;
     setup_opengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
     setup_imgui(opengl.window);
 

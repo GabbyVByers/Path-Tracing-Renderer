@@ -165,3 +165,4 @@ __host__ __device__ inline Vec3 reflect(const Vec3& a, const Vec3& n)
 	float s = 2.0f * dot(a, n);
 	return a - (n * s);
 }
+

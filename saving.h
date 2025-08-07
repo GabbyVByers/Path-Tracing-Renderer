@@ -2,7 +2,6 @@
 
 #include "world.h"
 #include <fstream>
-#include <iostream>
 
 inline void save_spheres(World& world)
 {
@@ -30,6 +29,14 @@ inline void load_spheres(World& world)
 
 	char* save_data = new char[size_bytes];
 	in_file.read(save_data, size_bytes);
+
+	int num_spheres = size_bytes / sizeof(Sphere);
+
+	free_spheres(world.spheres);
+
+	world.spheres.num_spheres = num_spheres;
+	world.spheres.host_spheres = new Sphere[num_spheres];
+	cudaMalloc((void**)&world.spheres.device_spheres, sizeof(Sphere) * num_spheres);
 
 	memcpy(world.spheres.host_spheres, save_data, size_bytes);
 	update_spheres_on_gpu(world.spheres);
