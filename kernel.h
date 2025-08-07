@@ -11,6 +11,8 @@ struct Hit_info
     Vec3 hit_color;
     Vec3 hit_normal;
     float hit_roughness;
+    bool hit_is_light_source;
+    float hit_light_intensity;
 };
 
 struct Ray
@@ -52,6 +54,8 @@ __device__ inline Hit_info ray_spheres_intersection(const Ray& ray, const World&
             info.hit_normal = info.hit_location - world.spheres.device_spheres[i].position;
             normalize(info.hit_normal);
             info.hit_roughness = world.spheres.device_spheres[i].roughness;
+            info.hit_is_light_source = world.spheres.device_spheres[i].is_light_source;
+            info.hit_light_intensity = world.spheres.device_spheres[i].light_intensity;
         }
     }
 
@@ -82,7 +86,14 @@ __device__ inline Vec3 calculate_incoming_light(Ray ray, Thread& thread, const W
 
         if (!info.did_hit)
         {
-            light = environment_light(ray, world);
+            if (world.sky.toggle_sky)
+                light = environment_light(ray, world);
+            break;
+        }
+
+        if (info.hit_is_light_source)
+        {
+            light = info.hit_color * info.hit_light_intensity;
             break;
         }
 

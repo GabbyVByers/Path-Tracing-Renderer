@@ -41,10 +41,6 @@ inline void draw_imgui(World& world)
     ImGui::NewFrame();
     
     ImGui::Begin("DEBUGGER");
-    ImGui::Text("Camera POS   x:%.2f, y:%.2f, z:%.2f", world.camera.position.x,  world.camera.position.y,  world.camera.position.z);
-    ImGui::Text("Camera DIR   x:%.2f, y:%.2f, z:%.2f", world.camera.direction.x, world.camera.direction.y, world.camera.direction.z);
-    ImGui::Text("Camera UP    x:%.2f, y:%.2f, z:%.2f", world.camera.up.x,        world.camera.up.y,        world.camera.up.z);
-    ImGui::Text("Camera RIGHT x:%.2f, y:%.2f, z:%.2f", world.camera.right.x,     world.camera.right.y,     world.camera.right.z);
     ImGui::Text("Accumulated Frames: %d", world.buffer.num_accumulated_frames);
     
     ImGui::Text(" ");
@@ -60,9 +56,11 @@ inline void draw_imgui(World& world)
     ImGui::SliderFloat("Sun Exp", &world.sky.sun_exponent, 1.0f, 150.0f);
     ImGui::SliderFloat("Hor Exp", &world.sky.horizon_exponent, 0.0f, 1.0f);
 
+    ImGui::Text(" ");
+    if (ImGui::Button("Toggle Enviroment Lighting"))
+        world.sky.toggle_sky = !world.sky.toggle_sky;
     if (ImGui::Button("Save Spheres"))
         save_spheres(world);
-
     if (ImGui::Button("Load Spheres"))
         load_spheres(world);
 
@@ -73,10 +71,12 @@ inline void draw_imgui(World& world)
         if (ImGui::Button("Deselect Sphere"))
             selected_host_sphere->is_selected = false;
 
+        ImGui::Text(" ");
         ImGui::SliderFloat("Roughness", &selected_host_sphere->roughness, 0.0f, 1.0f);
         ImGui::SliderFloat("Radius", &selected_host_sphere->radius, 0.1f, 20.0f);
         
-                           if (ImGui::Button("+X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 0.01f; }
+
+        ImGui::Text(" ");  if (ImGui::Button("+X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 0.01f; }
         ImGui::SameLine(); if (ImGui::Button("++X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 0.1f;  }
         ImGui::SameLine(); if (ImGui::Button("+++X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 1.0f;  }
         ImGui::SameLine(); if (ImGui::Button("---X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x -= 1.0f;  }
@@ -97,7 +97,11 @@ inline void draw_imgui(World& world)
         ImGui::SameLine(); if (ImGui::Button("--Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.1f;  }
         ImGui::SameLine(); if (ImGui::Button("-Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.01f; }
         
+        ImGui::Text(" ");
         ImGui::ColorEdit3("Change Color", (float*)&selected_host_sphere->color);
+        if (ImGui::Button("Toggle Light Source"))
+            selected_host_sphere->is_light_source = !selected_host_sphere->is_light_source;
+        ImGui::SliderFloat("Light Intensity", &selected_host_sphere->light_intensity, 0.0f, 35.0f);
 
         ImGui::End();
 

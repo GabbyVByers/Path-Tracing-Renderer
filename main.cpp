@@ -14,7 +14,6 @@ int main()
     fix_camera(world.camera);
     build_hash_array_and_frame_buffer(world.buffer, screen_size(opengl));
     initialize_spheres(world.spheres);
-    update_spheres_on_gpu(world.spheres);
 
     while (!glfwWindowShouldClose(opengl.window))
     {

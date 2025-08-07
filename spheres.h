@@ -9,6 +9,8 @@ struct Sphere
     Vec3 color;
     float roughness = 1.0f;
     bool is_selected = false;
+    bool is_light_source = false;
+    float light_intensity = 0.0f;
 };
 
 struct Spheres

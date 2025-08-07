@@ -14,6 +14,7 @@ struct Camera
 
 struct Sky
 {
+    bool toggle_sky = true;
     Vec3 sun_direction = return_normalized({ 1.0f, 1.0f, 1.0f });
     float sun_intensity = 20.0f;
     float sun_exponent = 50.0f;
