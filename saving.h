@@ -14,7 +14,8 @@ inline void saveSpheres(World& world, char fileName[24])
 	realFileName = "saves/" + realFileName + ".bin";
 
 	std::ofstream outFile(realFileName, std::ios::binary);
-	if (outFile.is_open()) {
+	if (outFile.is_open())
+	{
 		outFile.write(reinterpret_cast<const char*>(saveData), sizeBytes);
 		outFile.close();
 	}

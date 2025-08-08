@@ -24,14 +24,11 @@ inline void setupImgui(GLFWwindow* window)
 inline void drawImgui(World& world, char fileName[24], int fps)
 {
     Sphere* selectedHostSphere = nullptr;
-    int indexSelectedSphere = -1;
-
     for (int i = 0; i < world.spheres.numSpheres; i++)
     {
         if (world.spheres.hostSpheres[i].isSelected == true)
         {
             selectedHostSphere = &world.spheres.hostSpheres[i];
-            indexSelectedSphere = i;
             break;
         }
     }
@@ -79,35 +76,14 @@ inline void drawImgui(World& world, char fileName[24], int fps)
             selectedHostSphere->isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::SliderFloat("Roughness", &selectedHostSphere->roughness, 0.0f, 1.0f);
         ImGui::SliderFloat("Radius", &selectedHostSphere->radius, 0.1f, 20.0f);
-        
-
-        ImGui::Text(" ");  if (ImGui::Button("+X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x += 0.01f; }
-        ImGui::SameLine(); if (ImGui::Button("++X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x += 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("+++X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x += 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("---X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x -= 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("--X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x -= 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("-X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x -= 0.01f; }
-
-                           if (ImGui::Button("+Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y += 0.01f; }
-        ImGui::SameLine(); if (ImGui::Button("++Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y += 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("+++Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y += 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("---Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y -= 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("--Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y -= 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("-Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y -= 0.01f; }
-
-                           if (ImGui::Button("+Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z += 0.01f; }
-        ImGui::SameLine(); if (ImGui::Button("++Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z += 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("+++Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z += 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("---Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z -= 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("--Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z -= 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("-Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z -= 0.01f; }
+        ImGui::DragFloat3("Position", (float*)&selectedHostSphere->position, 0.05f);
         
         ImGui::Text(" ");
+        ImGui::SliderFloat("Roughness", &selectedHostSphere->roughness, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", (float*)&selectedHostSphere->color);
 
-        
+        ImGui::Text(" ");
         if (ImGui::Button("Toggle Light Source"))
             selectedHostSphere->isLightSource = !selectedHostSphere->isLightSource;
         ImGui::SliderFloat("Intensity", &selectedHostSphere->lightIntensity, 0.0f, 35.0f);

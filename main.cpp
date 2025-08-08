@@ -8,7 +8,7 @@ int main()
 {
     const bool FULLSCREEN = true;
     Opengl opengl;
-    setupOpengl(opengl, 1920, 1080, "CUDA-Powered Ray-Tracing", FULLSCREEN);
+    setupOpengl(opengl, 1920, 1080, "CUDA-Powered Path-Tracing", FULLSCREEN);
     setupImgui(opengl.window);
 
     World world;
