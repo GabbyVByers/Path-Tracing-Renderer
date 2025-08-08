@@ -165,3 +165,4 @@ inline void finishRendering(Opengl& opengl) {
 inline int screenSize(const Opengl& opengl) {
     return opengl.screenWidth * opengl.screenHeight;
 }
+

@@ -63,3 +63,4 @@ inline void selectSphere(Opengl& opengl, World& world) {
 
     updateSpheresOnGpu(world.spheres);
 }
+
