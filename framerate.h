@@ -20,8 +20,8 @@ public:
 		std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsedTime = currentTime - lastTime;
 
-		if (elapsedTime.count() >= 0.1) {
-			frameRate = frameCount * 10;
+		if (elapsedTime.count() >= 0.25) {
+			frameRate = frameCount * 4;
 			frameCount = 0;
 			lastTime = currentTime;
 		}

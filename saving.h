@@ -4,50 +4,47 @@
 #include <fstream>
 #include <string>
 
-inline void save_spheres(World& world, char file_name[24])
-{
-	size_t size_bytes = sizeof(Sphere) * world.spheres.num_spheres;
-	unsigned char* save_data = new unsigned char[size_bytes];
-	memcpy(save_data, world.spheres.host_spheres, size_bytes);
+inline void saveSpheres(World& world, char fileName[24]) {
+	size_t sizeBytes = sizeof(Sphere) * world.spheres.numSpheres;
+	unsigned char* saveData = new unsigned char[sizeBytes];
+	memcpy(saveData, world.spheres.hostSpheres, sizeBytes);
 
-	std::string real_file_name(&file_name[0], sizeof(file_name));
-	real_file_name = "saves/" + real_file_name + ".bin";
+	std::string realFileName(&fileName[0], sizeof(fileName));
+	realFileName = "saves/" + realFileName + ".bin";
 
-	std::ofstream out_file(real_file_name, std::ios::binary);
-	if (out_file.is_open())
-	{
-		out_file.write(reinterpret_cast<const char*>(save_data), size_bytes);
-		out_file.close();
+	std::ofstream outFile(realFileName, std::ios::binary);
+	if (outFile.is_open()) {
+		outFile.write(reinterpret_cast<const char*>(saveData), sizeBytes);
+		outFile.close();
 	}
 
-	delete[] save_data;
+	delete[] saveData;
 }
 
-inline void load_spheres(World& world, char file_name[24])
-{
-	std::string real_file_name(file_name, sizeof(file_name));
-	real_file_name = "saves/" + real_file_name + ".bin";
-	std::ifstream in_file(real_file_name, std::ios::binary);
+inline void loadSpheres(World& world, char fileName[24]) {
+	std::string realFileName(fileName, sizeof(fileName));
+	realFileName = "saves/" + realFileName + ".bin";
+	std::ifstream inFile(realFileName, std::ios::binary);
 
-	if (!in_file.is_open())
+	if (!inFile.is_open())
 		return;
 
-	in_file.seekg(0, std::ios::end);
-	size_t size_bytes = in_file.tellg();
-	in_file.seekg(0, std::ios::beg);
+	inFile.seekg(0, std::ios::end);
+	size_t sizeBytes = inFile.tellg();
+	inFile.seekg(0, std::ios::beg);
 
-	char* save_data = new char[size_bytes];
-	in_file.read(save_data, size_bytes);
+	char* saveData = new char[sizeBytes];
+	inFile.read(saveData, sizeBytes);
 
-	int num_spheres = size_bytes / sizeof(Sphere);
+	int numSpheres = sizeBytes / sizeof(Sphere);
 
-	free_spheres(world.spheres);
+	freeSpheres(world.spheres);
 
-	world.spheres.num_spheres = num_spheres;
-	world.spheres.host_spheres = new Sphere[num_spheres];
-	cudaMalloc((void**)&world.spheres.device_spheres, sizeof(Sphere) * num_spheres);
+	world.spheres.numSpheres = numSpheres;
+	world.spheres.hostSpheres = new Sphere[numSpheres];
+	cudaMalloc((void**)&world.spheres.deviceSpheres, sizeof(Sphere) * numSpheres);
 
-	memcpy(world.spheres.host_spheres, save_data, size_bytes);
-	update_spheres_on_gpu(world.spheres);
+	memcpy(world.spheres.hostSpheres, saveData, sizeBytes);
+	updateSpheresOnGpu(world.spheres);
 }
 

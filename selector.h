@@ -2,18 +2,16 @@
 
 #include "opengl.h"
 
-inline int mouse_spheres_intersection(const Ray& ray, const World& world)
-{
-    Hit_info info;
+inline int mouseSpheresIntersection(const Ray& ray, const World& world) {
+    HitInfo info;
     float closest_t = FLT_MAX;
     int index = -1;
 
-    for (int i = 0; i < world.spheres.num_spheres; i++)
-    {
-        Vec3 V = ray.origin - world.spheres.host_spheres[i].position;
+    for (int i = 0; i < world.spheres.numSpheres; i++) {
+        Vec3 V = ray.origin - world.spheres.hostSpheres[i].position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
-        float c = dot(V, V) - (world.spheres.host_spheres[i].radius * world.spheres.host_spheres[i].radius);
+        float c = dot(V, V) - (world.spheres.hostSpheres[i].radius * world.spheres.hostSpheres[i].radius);
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
@@ -26,10 +24,9 @@ inline int mouse_spheres_intersection(const Ray& ray, const World& world)
         if (t <= 0.0f)
             continue;
 
-        info.did_hit = true;
+        info.didHit = true;
 
-        if (t < closest_t)
-        {
+        if (t < closest_t) {
             closest_t = t;
             index = i;
         }
@@ -38,33 +35,31 @@ inline int mouse_spheres_intersection(const Ray& ray, const World& world)
     return index;
 }
 
-inline void select_sphere(Opengl& opengl, World& world)
-{
+inline void selectSphere(Opengl& opengl, World& world) {
     if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS)
         return;
 
-	for (int i = 0; i < world.spheres.num_spheres; i++)
-		world.spheres.host_spheres[i].is_selected = false;
-	
-	int screen_width = opengl.screen_width;
-	int screen_height = opengl.screen_height;
-	
-	double mouse_x;
-	double mouse_y;
-	glfwGetCursorPos(opengl.window, &mouse_x, &mouse_y);
+    for (int i = 0; i < world.spheres.numSpheres; i++)
+        world.spheres.hostSpheres[i].isSelected = false;
 
-    float v = (((screen_height - mouse_y) / screen_height) * 2.0f) - 1.0f;
-    float u = (((mouse_x / screen_width) * 2.0f) - 1.0f) * (screen_width / (float)screen_height);
+    int screenWidth = opengl.screenWidth;
+    int screenHeight = opengl.screenHeight;
 
-	Ray mouse_ray;
-	mouse_ray.origin = world.camera.position;
-	mouse_ray.direction = (world.camera.direction * world.camera.depth) + (world.camera.right * u) + (world.camera.up * v);
-	
-	int mouse_sphere_index = mouse_spheres_intersection(mouse_ray, world);
-	
-	if (mouse_sphere_index != -1)
-		world.spheres.host_spheres[mouse_sphere_index].is_selected = true;
-	
-	update_spheres_on_gpu(world.spheres);
+    double mouseX;
+    double mouseY;
+    glfwGetCursorPos(opengl.window, &mouseX, &mouseY);
+
+    float v = (((screenHeight - mouseY) / screenHeight) * 2.0f) - 1.0f;
+    float u = (((mouseX / screenWidth) * 2.0f) - 1.0f) * (screenWidth / (float)screenHeight);
+
+    Ray mouseRay;
+    mouseRay.origin = world.camera.position;
+    mouseRay.direction = (world.camera.direction * world.camera.depth) + (world.camera.right * u) + (world.camera.up * v);
+
+    int mouseSphereIndex = mouseSpheresIntersection(mouseRay, world);
+
+    if (mouseSphereIndex != -1)
+        world.spheres.hostSpheres[mouseSphereIndex].isSelected = true;
+
+    updateSpheresOnGpu(world.spheres);
 }
-

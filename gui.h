@@ -8,8 +8,7 @@
 #include "saving.h"
 #include "framerate.h"
 
-inline void setup_imgui(GLFWwindow* window)
-{
+inline void setupImgui(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -21,17 +20,14 @@ inline void setup_imgui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-inline void draw_imgui(World& world, char file_name[24], int fps)
-{
+inline void drawImgui(World& world, char fileName[24], int fps) {
+    Sphere* selectedHostSphere = nullptr;
+    int indexSelectedSphere = -1;
 
-    Sphere* selected_host_sphere = nullptr;
-    int index_selected_sphere = -1;
-    for (int i = 0; i < world.spheres.num_spheres; i++)
-    {
-        if (world.spheres.host_spheres[i].is_selected == true)
-        {
-            selected_host_sphere = &world.spheres.host_spheres[i];
-            index_selected_sphere = i;
+    for (int i = 0; i < world.spheres.numSpheres; i++) {
+        if (world.spheres.hostSpheres[i].isSelected == true) {
+            selectedHostSphere = &world.spheres.hostSpheres[i];
+            indexSelectedSphere = i;
             break;
         }
     }
@@ -43,78 +39,77 @@ inline void draw_imgui(World& world, char file_name[24], int fps)
     
     ImGui::Begin("DEBUGGER");
     ImGui::Text("Frames Per Second: %d", fps);
-    ImGui::Text("Accumulated Frames: %d", world.buffer.num_accumulated_frames);
+    ImGui::Text("Accumulated Frames: %d", world.buffer.numAccumulatedFrames);
 
     ImGui::Text(" ");
     if (ImGui::Button("Toggle Enviroment Lighting"))
-        world.sky.toggle_sky = !world.sky.toggle_sky;
+        world.sky.toggleSky = !world.sky.toggleSky;
     
     ImGui::Text(" ");
     ImGui::Text("SUN DIRECTION");
-    ImGui::SliderFloat("Sun.dir.x", &world.sky.sun_direction.x, -1.0f, 1.0f);
-    ImGui::SliderFloat("Sun.dir.y", &world.sky.sun_direction.y, -1.0f, 1.0f);
-    ImGui::SliderFloat("Sun.dir.z", &world.sky.sun_direction.z, -1.0f, 1.0f);
-    normalize(world.sky.sun_direction);
+    ImGui::SliderFloat("Sun.dir.x", &world.sky.sunDirection.x, -1.0f, 1.0f);
+    ImGui::SliderFloat("Sun.dir.y", &world.sky.sunDirection.y, -1.0f, 1.0f);
+    ImGui::SliderFloat("Sun.dir.z", &world.sky.sunDirection.z, -1.0f, 1.0f);
+    normalize(world.sky.sunDirection);
 
     ImGui::Text(" ");
     ImGui::Text("SKY PARAMETERS");
-    ImGui::SliderFloat("Sun Int", &world.sky.sun_intensity, 0.0f, 100.0f);
-    ImGui::SliderFloat("Sun Exp", &world.sky.sun_exponent, 1.0f, 150.0f);
-    ImGui::SliderFloat("Hor Exp", &world.sky.horizon_exponent, 0.0f, 1.0f);
+    ImGui::SliderFloat("Sun Int", &world.sky.sunIntensity, 0.0f, 100.0f);
+    ImGui::SliderFloat("Sun Exp", &world.sky.sunExponent, 1.0f, 150.0f);
+    ImGui::SliderFloat("Hor Exp", &world.sky.horizonExponent, 0.0f, 1.0f);
 
     ImGui::Text(" ");
     ImGui::Text("Save or Load World Geometry");
-    ImGui::InputText("File Name", file_name, IM_ARRAYSIZE(file_name));
+    ImGui::InputText("File Name", fileName, IM_ARRAYSIZE(fileName));
     if (ImGui::Button("Save Geometry"))
-        save_spheres(world, file_name);
+        saveSpheres(world, fileName);
     ImGui::SameLine();
     if (ImGui::Button("Load Geometry"))
-        load_spheres(world, file_name);
+        loadSpheres(world, fileName);
 
-    if (selected_host_sphere != nullptr)
-    {
+    if (selectedHostSphere != nullptr) {
         ImGui::Begin("Selected Sphere");
 
         if (ImGui::Button("Deselect Sphere"))
-            selected_host_sphere->is_selected = false;
+            selectedHostSphere->isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::SliderFloat("Roughness", &selected_host_sphere->roughness, 0.0f, 1.0f);
-        ImGui::SliderFloat("Radius", &selected_host_sphere->radius, 0.1f, 20.0f);
+        ImGui::SliderFloat("Roughness", &selectedHostSphere->roughness, 0.0f, 1.0f);
+        ImGui::SliderFloat("Radius", &selectedHostSphere->radius, 0.1f, 20.0f);
         
 
-        ImGui::Text(" ");  if (ImGui::Button("+X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 0.01f; }
-        ImGui::SameLine(); if (ImGui::Button("++X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("+++X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x += 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("---X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x -= 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("--X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x -= 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("-X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.x -= 0.01f; }
+        ImGui::Text(" ");  if (ImGui::Button("+X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x += 0.01f; }
+        ImGui::SameLine(); if (ImGui::Button("++X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x += 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("+++X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x += 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("---X") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x -= 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("--X")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x -= 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("-X")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.x -= 0.01f; }
 
-                           if (ImGui::Button("+Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y += 0.01f; }
-        ImGui::SameLine(); if (ImGui::Button("++Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y += 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("+++Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y += 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("---Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y -= 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("--Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y -= 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("-Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.y -= 0.01f; }
+                           if (ImGui::Button("+Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y += 0.01f; }
+        ImGui::SameLine(); if (ImGui::Button("++Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y += 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("+++Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y += 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("---Y") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y -= 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("--Y")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y -= 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("-Y")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.y -= 0.01f; }
 
-                           if (ImGui::Button("+Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z += 0.01f; }
-        ImGui::SameLine(); if (ImGui::Button("++Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z += 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("+++Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z += 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("---Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 1.0f;  }
-        ImGui::SameLine(); if (ImGui::Button("--Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.1f;  }
-        ImGui::SameLine(); if (ImGui::Button("-Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selected_host_sphere->position.z -= 0.01f; }
+                           if (ImGui::Button("+Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z += 0.01f; }
+        ImGui::SameLine(); if (ImGui::Button("++Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z += 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("+++Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z += 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("---Z") || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z -= 1.0f;  }
+        ImGui::SameLine(); if (ImGui::Button("--Z")  || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z -= 0.1f;  }
+        ImGui::SameLine(); if (ImGui::Button("-Z")   || (ImGui::IsItemActive() && ImGui::IsMouseDown(0))) { selectedHostSphere->position.z -= 0.01f; }
         
         ImGui::Text(" ");
-        ImGui::ColorEdit3("Color", (float*)&selected_host_sphere->color);
+        ImGui::ColorEdit3("Color", (float*)&selectedHostSphere->color);
 
         
         if (ImGui::Button("Toggle Light Source"))
-            selected_host_sphere->is_light_source = !selected_host_sphere->is_light_source;
-        ImGui::SliderFloat("Intensity", &selected_host_sphere->light_intensity, 0.0f, 35.0f);
+            selectedHostSphere->isLightSource = !selectedHostSphere->isLightSource;
+        ImGui::SliderFloat("Intensity", &selectedHostSphere->lightIntensity, 0.0f, 35.0f);
 
         ImGui::End();
 
-        update_spheres_on_gpu(world.spheres);
+        updateSpheresOnGpu(world.spheres);
     }
 
     ImGui::End();

@@ -3,8 +3,7 @@
 #include "spheres.h"
 #include "utilities.h"
 
-struct Camera
-{
+struct Camera {
     Vec3 position = { 0.0f, 0.0f, -5.0f };
     Vec3 direction = { 0.0f, 0.0f, 1.0f };
     Vec3 up;
@@ -12,32 +11,29 @@ struct Camera
     float depth = 1.5f;
 };
 
-struct Sky
-{
-    bool toggle_sky = true;
-    Vec3 sun_direction = return_normalized({ 1.0f, 1.0f, 1.0f });
-    float sun_intensity = 20.0f;
-    float sun_exponent = 50.0f;
-    float horizon_exponent = 0.35f;
+struct Sky {
+    bool toggleSky = true;
+    Vec3 sunDirection = returnNormalized({ 1.0f, 1.0f, 1.0f });
+    float sunIntensity = 20.0f;
+    float sunExponent = 50.0f;
+    float horizonExponent = 0.35f;
 
-    Vec3 color_sun     = rgb(255, 255, 255);
-    Vec3 color_zenith  = rgb(255, 255, 255);
-    Vec3 color_horizon = rgb( 63, 195, 235);
-    Vec3 color_ground  = rgb( 79, 112,  76);
+    Vec3 colorSun     = rgb(255, 255, 255);
+    Vec3 colorZenith  = rgb(255, 255, 255);
+    Vec3 colorHorizon = rgb( 63, 195, 235);
+    Vec3 colorGround  = rgb( 79, 112,  76);
 };
 
-struct Buffer
-{
-    int num_accumulated_frames = 0;
-    Vec3* accumulated_frame_buffer;
-    unsigned int* device_hash_array = nullptr;
+struct Buffer {
+    int numAccumulatedFrames = 0;
+    Vec3* accumulatedFrameBuffer;
+    unsigned int* deviceHashArray = nullptr;
 };
 
-struct World
-{   
+struct World {   
     uchar4* pixels = nullptr;
-    int screen_width = 0;
-    int screen_height = 0;
+    int screenWidth = 0;
+    int screenHeight = 0;
 
     Camera camera;
     Sky sky;
@@ -45,8 +41,7 @@ struct World
     Buffer buffer;
 };
 
-inline void fix_camera(Camera& camera)
-{
+inline void fixCamera(Camera& camera) {
     const Vec3 up = { 0.0f, 1.0f, 0.0f };
     normalize(camera.direction);
     camera.right = cross(camera.direction, up);
@@ -55,19 +50,17 @@ inline void fix_camera(Camera& camera)
     normalize(camera.up);
 }
 
-inline void build_hash_array_and_frame_buffer(Buffer& buffer, int screen_size)
-{
-    unsigned int* host_hash_array = nullptr;
-    host_hash_array = new unsigned int[screen_size];
-    for (int i = 0; i < screen_size; i++)
-    {
+inline void buildHashArrayAndFrameBuffer(Buffer& buffer, int screenSize) {
+    unsigned int* hostHashArray = nullptr;
+    hostHashArray = new unsigned int[screenSize];
+    for (int i = 0; i < screenSize; i++) {
         unsigned int hash = i;
         hash_uint32(hash);
-        host_hash_array[i] = hash;
+        hostHashArray[i] = hash;
     }
-    cudaMalloc((void**)&buffer.device_hash_array, sizeof(unsigned int) * screen_size);
-    cudaMemcpy(buffer.device_hash_array, host_hash_array, sizeof(unsigned int) * screen_size, cudaMemcpyHostToDevice);
-    delete[] host_hash_array;
-    cudaMalloc((void**)&buffer.accumulated_frame_buffer, sizeof(Vec3) * screen_size);
+    cudaMalloc((void**)&buffer.deviceHashArray, sizeof(unsigned int) * screenSize);
+    cudaMemcpy(buffer.deviceHashArray, hostHashArray, sizeof(unsigned int) * screenSize, cudaMemcpyHostToDevice);
+    delete[] hostHashArray;
+    cudaMalloc((void**)&buffer.accumulatedFrameBuffer, sizeof(Vec3) * screenSize);
 }
 

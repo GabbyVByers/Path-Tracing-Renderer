@@ -10,93 +10,84 @@
 
 #include <iostream>
 
-struct Opengl
-{
-    int screen_width = 0;
-    int screen_height = 0;
-    GLuint pbo = 0;
-    GLuint texture_id = 0;
-    cudaGraphicsResource* cuda_pbo = nullptr;
+struct Opengl {
+    int screenWidth = 0;
+    int screenHeight = 0;
+    GLuint textureId = 0;
+    GLuint PBO = 0;
+    cudaGraphicsResource* cudaPBO = nullptr;
     GLFWmonitor* primary = nullptr;
     GLFWwindow* window = nullptr;
     GLuint shader = 0;
-    GLuint quad_vao = 0;
-    GLuint quad_vbo = 0;
+    GLuint quadVAO = 0;
+    GLuint quadVBO = 0;
     dim3 block = 0;
     dim3 grid = 0;
-    double prev_mouse_x = 0.0f;
-    double prev_mouse_y = 0.0f;
+    double prevMouseX = 0.0f;
+    double prevMouseY = 0.0f;
 };
 
-inline void setup_opengl(Opengl& opengl, int screen_width, int screen_height, std::string title, bool full_screen)
-{
+inline void setupOpengl(Opengl& opengl, int screenWidth, int screenHeight, std::string title, bool fullScreen) {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    if (full_screen)
-    {
+    if (fullScreen) {
         opengl.primary = glfwGetPrimaryMonitor();
-        opengl.screen_width = glfwGetVideoMode(opengl.primary)->width;
-        opengl.screen_height = glfwGetVideoMode(opengl.primary)->height;
-        opengl.window = glfwCreateWindow(opengl.screen_width, opengl.screen_height, title.c_str(), opengl.primary, nullptr);
-    }
-    else
-    {
-        opengl.screen_width = screen_width;
-        opengl.screen_height = screen_height;
-        opengl.window = glfwCreateWindow(opengl.screen_width, opengl.screen_height, title.c_str(), nullptr, nullptr);
+        opengl.screenWidth = glfwGetVideoMode(opengl.primary)->width;
+        opengl.screenHeight = glfwGetVideoMode(opengl.primary)->height;
+        opengl.window = glfwCreateWindow(opengl.screenWidth, opengl.screenHeight, title.c_str(), opengl.primary, nullptr);
+    } else {
+        opengl.screenWidth = screenWidth;
+        opengl.screenHeight = screenHeight;
+        opengl.window = glfwCreateWindow(opengl.screenWidth, opengl.screenHeight, title.c_str(), nullptr, nullptr);
     }
 
     opengl.block = dim3(32, 32);
-    opengl.grid = dim3((opengl.screen_width / 32) + 1, (opengl.screen_height / 32) + 1);
+    opengl.grid = dim3((opengl.screenWidth / 32) + 1, (opengl.screenHeight / 32) + 1);
     glfwMakeContextCurrent(opengl.window);
     glfwSwapInterval(0);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    glGenBuffers(1, &opengl.pbo);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.pbo);
-    glBufferData(GL_PIXEL_UNPACK_BUFFER, opengl.screen_width * opengl.screen_height * 4, nullptr, GL_DYNAMIC_DRAW);
+    glGenBuffers(1, &opengl.PBO);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.PBO);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, opengl.screenWidth * opengl.screenHeight * 4, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-    cudaGraphicsGLRegisterBuffer(&opengl.cuda_pbo, opengl.pbo, cudaGraphicsMapFlagsWriteDiscard);
-    glGenTextures(1, &opengl.texture_id);
-    glBindTexture(GL_TEXTURE_2D, opengl.texture_id);
+    cudaGraphicsGLRegisterBuffer(&opengl.cudaPBO, opengl.PBO, cudaGraphicsMapFlagsWriteDiscard);
+    glGenTextures(1, &opengl.textureId);
+    glBindTexture(GL_TEXTURE_2D, opengl.textureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, opengl.screen_width, opengl.screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, opengl.screenWidth, opengl.screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    const char* vertex_shader_src =
-        R"glsl(
+    const char* vertexShaderSrc = R"glsl(
         #version 330 core
-        layout (location = 0) in vec2 a_pos;
-        layout (location = 1) in vec2 a_tex;
-        out vec2 tex_coord;
-        void main()
-        {
-            gl_Position = vec4(a_pos.xy, 0.0, 1.0);
-            tex_coord = a_tex;
+        layout (location = 0) in vec2 aPos;
+        layout (location = 1) in vec2 aTex;
+        out vec2 texCoord;
+        void main() {
+            gl_Position = vec4(aPos.xy, 0.0, 1.0);
+            texCoord = aTex;
         }
     )glsl";
 
-    const char* fragment_shader_src =
-        R"glsl(
+    const char* fragmentShaderSrc = R"glsl(
         #version 330 core
-        in vec2 tex_coord;
-        out vec4 frag_color;
-        uniform sampler2D screen_texture;
-        void main()
-        {
-            frag_color = texture(screen_texture, tex_coord);
+        in vec2 texCoord;
+        out vec4 fragColor;
+        uniform sampler2D screenTexture;
+        void main() {
+            fragColor = texture(screenTexture, texCoord);
         }
     )glsl";
 
     GLuint vert = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vert, 1, &vertex_shader_src, nullptr);
+    glShaderSource(vert, 1, &vertexShaderSrc, nullptr);
     glCompileShader(vert);
     GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag, 1, &fragment_shader_src, nullptr);
+    glShaderSource(frag, 1, &fragmentShaderSrc, nullptr);
     glCompileShader(frag);
     opengl.shader = glCreateProgram();
     glAttachShader(opengl.shader, vert);
@@ -105,22 +96,20 @@ inline void setup_opengl(Opengl& opengl, int screen_width, int screen_height, st
     glDeleteShader(vert);
     glDeleteShader(frag);
 
-    float quad_vertices[] =
-    {
+    float quadVertices[] = {
         -1.0f,  1.0f,   0.0f, 1.0f,
         -1.0f, -1.0f,   0.0f, 0.0f,
          1.0f, -1.0f,   1.0f, 0.0f,
-
         -1.0f,  1.0f,   0.0f, 1.0f,
          1.0f, -1.0f,   1.0f, 0.0f,
          1.0f,  1.0f,   1.0f, 1.0f
     };
 
-    glGenVertexArrays(1, &opengl.quad_vao);
-    glGenBuffers(1, &opengl.quad_vbo);
-    glBindVertexArray(opengl.quad_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, opengl.quad_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
+    glGenVertexArrays(1, &opengl.quadVAO);
+    glGenBuffers(1, &opengl.quadVBO);
+    glBindVertexArray(opengl.quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, opengl.quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
@@ -130,57 +119,49 @@ inline void setup_opengl(Opengl& opengl, int screen_width, int screen_height, st
     return;
 }
 
-inline void free_opengl(Opengl& opengl)
-{
-    cudaGraphicsUnregisterResource(opengl.cuda_pbo);
-    glDeleteBuffers(1, &opengl.pbo);
-    glDeleteTextures(1, &opengl.texture_id);
-    glDeleteVertexArrays(1, &opengl.quad_vao);
-    glDeleteBuffers(1, &opengl.quad_vbo);
+inline void freeOpengl(Opengl& opengl) {
+    cudaGraphicsUnregisterResource(opengl.cudaPBO);
+    glDeleteBuffers(1, &opengl.PBO);
+    glDeleteTextures(1, &opengl.textureId);
+    glDeleteVertexArrays(1, &opengl.quadVAO);
+    glDeleteBuffers(1, &opengl.quadVBO);
     glDeleteProgram(opengl.shader);
     glfwDestroyWindow(opengl.window);
     glfwTerminate();
 }
 
-inline void launch_cuda_kernel(Opengl& opengl, World& world)
-{
+inline void launchCudaKernel(Opengl& opengl, World& world) {
     size_t size;
-    cudaGraphicsMapResources(1, &opengl.cuda_pbo, 0);
-    cudaGraphicsResourceGetMappedPointer((void**)&world.pixels, &size, opengl.cuda_pbo);
+    cudaGraphicsMapResources(1, &opengl.cudaPBO, 0);
+    cudaGraphicsResourceGetMappedPointer((void**)&world.pixels, &size, opengl.cudaPBO);
 
     dim3 GRID = opengl.grid;
     dim3 BLOCK = opengl.block;
-    world.screen_width = opengl.screen_width;
-    world.screen_height = opengl.screen_height;
-    main_kernel <<<GRID, BLOCK>>> (world);
+    world.screenWidth = opengl.screenWidth;
+    world.screenHeight = opengl.screenHeight;
+    mainKernel <<<GRID, BLOCK>>> (world);
 }
 
-inline void render_screen(Opengl& opengl)
-{
-    cudaGraphicsUnmapResources(1, &opengl.cuda_pbo, 0);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.pbo);
-    glBindTexture(GL_TEXTURE_2D, opengl.texture_id);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, opengl.screen_width, opengl.screen_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+inline void renderScreen(Opengl& opengl) {
+    cudaGraphicsUnmapResources(1, &opengl.cudaPBO, 0);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.PBO);
+    glBindTexture(GL_TEXTURE_2D, opengl.textureId);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, opengl.screenWidth, opengl.screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(opengl.shader);
-    glBindVertexArray(opengl.quad_vao);
-    glBindTexture(GL_TEXTURE_2D, opengl.texture_id);
+    glBindVertexArray(opengl.quadVAO);
+    glBindTexture(GL_TEXTURE_2D, opengl.textureId);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-inline void finish_rendering(Opengl& opengl)
-{
+inline void finishRendering(Opengl& opengl) {
     glfwSwapBuffers(opengl.window);
     glfwPollEvents();
     if (glfwGetKey(opengl.window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
         glfwSetWindowShouldClose(opengl.window, true);
-    }
 }
 
-inline int screen_size(const Opengl& opengl)
-{
-    return opengl.screen_width * opengl.screen_height;
+inline int screenSize(const Opengl& opengl) {
+    return opengl.screenWidth * opengl.screenHeight;
 }
-

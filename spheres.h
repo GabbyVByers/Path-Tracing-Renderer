@@ -2,41 +2,36 @@
 
 #include "vec3.h"
 
-struct Sphere
-{
+struct Sphere {
     Vec3 position = { 0.0f, 0.0f, 0.0f };
     float radius = 1.0f;
     Vec3 color = rgb(255, 255, 255);
     float roughness = 0.5f;
-    bool is_selected = false;
-    bool is_light_source = false;
-    float light_intensity = 1.0f;
+    bool isSelected = false;
+    bool isLightSource = false;
+    float lightIntensity = 1.0f;
 };
 
-struct Spheres
-{
-    int num_spheres = 0;
-    Sphere* host_spheres = nullptr;
-    Sphere* device_spheres = nullptr;
+struct Spheres {
+    int numSpheres = 0;
+    Sphere* hostSpheres = nullptr;
+    Sphere* deviceSpheres = nullptr;
 };
 
-inline void update_spheres_on_gpu(Spheres& spheres)
-{
-    cudaMemcpy(spheres.device_spheres, spheres.host_spheres, sizeof(Sphere) * spheres.num_spheres, cudaMemcpyHostToDevice);
+inline void updateSpheresOnGpu(Spheres& spheres) {
+    cudaMemcpy(spheres.deviceSpheres, spheres.hostSpheres, sizeof(Sphere) * spheres.numSpheres, cudaMemcpyHostToDevice);
 }
 
-inline void free_spheres(Spheres& spheres)
-{
-    delete[] spheres.host_spheres;
-    cudaFree(spheres.device_spheres);
+inline void freeSpheres(Spheres& spheres) {
+    delete[] spheres.hostSpheres;
+    cudaFree(spheres.deviceSpheres);
 }
 
-inline void initialize_spheres(Spheres& spheres)
-{
-    spheres.num_spheres = 1;
-    spheres.host_spheres = nullptr;
-    spheres.host_spheres = new Sphere[spheres.num_spheres];
-    cudaMalloc((void**)&spheres.device_spheres, sizeof(Sphere) * spheres.num_spheres);
-    update_spheres_on_gpu(spheres);
+inline void initializeSpheres(Spheres& spheres) {
+    spheres.numSpheres = 1;
+    spheres.hostSpheres = nullptr;
+    spheres.hostSpheres = new Sphere[spheres.numSpheres];
+    cudaMalloc((void**)&spheres.deviceSpheres, sizeof(Sphere) * spheres.numSpheres);
+    updateSpheresOnGpu(spheres);
 }
 
