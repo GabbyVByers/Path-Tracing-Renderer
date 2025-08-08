@@ -1,6 +1,7 @@
 #pragma once
 
 #include "spheres.h"
+#include "boxes.h"
 #include "utilities.h"
 
 struct Camera {
@@ -38,6 +39,7 @@ struct World {
     Camera camera;
     Sky sky;
     Spheres spheres;
+    Boxes boxes;
     Buffer buffer;
 };
 

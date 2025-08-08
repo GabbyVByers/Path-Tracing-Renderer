@@ -15,6 +15,7 @@ int main()
     fixCamera(world.camera);
     buildHashArrayAndFrameBuffer(world.buffer, screenSize(opengl));
     initializeSpheres(world.spheres);
+    initializeBoxes(world.boxes);
 
     FrameRateTracker frameRateTracker;
 

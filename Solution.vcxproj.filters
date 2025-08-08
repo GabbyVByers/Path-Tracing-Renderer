@@ -118,6 +118,9 @@
     <CudaCompile Include="framerate.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
+    <CudaCompile Include="boxes.h">
+      <Filter>Header Files</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
