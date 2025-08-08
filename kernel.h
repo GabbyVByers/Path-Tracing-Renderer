@@ -32,7 +32,6 @@ __device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B) {
     if (fabs(hitLocation.z - A.z) < epsilon) return { 0.0f, 0.0f, -1.0f };
     if (fabs(hitLocation.z - B.z) < epsilon) return { 0.0f, 0.0f,  1.0f };
 
-    // something terrible has happened
     return { 0.0f, 0.0f, 0.0f };
 }
 
@@ -46,7 +45,6 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
         float tmin = -FLT_MAX;
         float tmax = FLT_MAX;
 
-        // X axis
         if (ray.direction.x != 0.0f) {
             float invD = 1.0f / ray.direction.x;
             float t0 = (A.x - ray.origin.x) * invD;
@@ -63,7 +61,6 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
             return info;
         }
 
-        // Y axis
         if (ray.direction.y != 0.0f) {
             float invD = 1.0f / ray.direction.y;
             float t0 = (A.y - ray.origin.y) * invD;
@@ -80,7 +77,6 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
             return info;
         }
 
-        // Z axis
         if (ray.direction.z != 0.0f) {
             float invD = 1.0f / ray.direction.z;
             float t0 = (A.z - ray.origin.z) * invD;
