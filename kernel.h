@@ -21,7 +21,7 @@ struct Ray {
 };
 
 __device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B) {
-    const float epsilon = 0.001f;
+    const float epsilon = 0.0001f;
 
     if (fabs(hitLocation.x - A.x) < epsilon) return { -1.0f, 0.0f, 0.0f };
     if (fabs(hitLocation.x - B.x) < epsilon) return {  1.0f, 0.0f, 0.0f };
@@ -168,7 +168,11 @@ __device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, const Wor
     light = 0.0f;
 
     for (int i = 0; i < 50; i++) {
-        HitInfo info = rayBoxesIntersection(ray, world);
+        HitInfo info = raySpheresIntersection(ray, world);
+        HitInfo boxInfo = rayBoxesIntersection(ray, world);
+
+        if (boxInfo.closest_t < info.closest_t)
+            info = boxInfo;
     
         if (!info.didHit) {
             if (world.sky.toggleSky)
