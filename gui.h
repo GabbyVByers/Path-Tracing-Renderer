@@ -8,7 +8,8 @@
 #include "saving.h"
 #include "framerate.h"
 
-inline void setupImgui(GLFWwindow* window) {
+inline void setupImgui(GLFWwindow* window)
+{
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -20,12 +21,15 @@ inline void setupImgui(GLFWwindow* window) {
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-inline void drawImgui(World& world, char fileName[24], int fps) {
+inline void drawImgui(World& world, char fileName[24], int fps)
+{
     Sphere* selectedHostSphere = nullptr;
     int indexSelectedSphere = -1;
 
-    for (int i = 0; i < world.spheres.numSpheres; i++) {
-        if (world.spheres.hostSpheres[i].isSelected == true) {
+    for (int i = 0; i < world.spheres.numSpheres; i++)
+    {
+        if (world.spheres.hostSpheres[i].isSelected == true)
+        {
             selectedHostSphere = &world.spheres.hostSpheres[i];
             indexSelectedSphere = i;
             break;
@@ -67,7 +71,8 @@ inline void drawImgui(World& world, char fileName[24], int fps) {
     if (ImGui::Button("Load Geometry"))
         loadSpheres(world, fileName);
 
-    if (selectedHostSphere != nullptr) {
+    if (selectedHostSphere != nullptr)
+    {
         ImGui::Begin("Selected Sphere");
 
         if (ImGui::Button("Deselect Sphere"))

@@ -4,7 +4,8 @@
 #include "world.h"
 #include <cfloat>
 
-struct HitInfo {
+struct HitInfo
+{
     float closest_t = FLT_MAX;
     bool didHit = false;
     Vec3 hitLocation;
@@ -15,12 +16,14 @@ struct HitInfo {
     float hitLightIntensity;
 };
 
-struct Ray {
+struct Ray
+{
     Vec3 origin;
     Vec3 direction;
 };
 
-__device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B) {
+__device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B)
+{
     const float epsilon = 0.0001f;
 
     if (fabs(hitLocation.x - A.x) < epsilon) return { -1.0f, 0.0f, 0.0f };
@@ -35,21 +38,25 @@ __device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B) {
     return { 0.0f, 0.0f, 0.0f };
 }
 
-__device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& world) {
+__device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& world)
+{
     HitInfo info;
 
-    for (int i = 0; i < world.boxes.numBoxes; i++) {
+    for (int i = 0; i < world.boxes.numBoxes; i++)
+    {
         const Vec3& A = world.boxes.deviceBoxes[i].boxMin;
         const Vec3& B = world.boxes.deviceBoxes[i].boxMax;
         
         float tmin = -FLT_MAX;
         float tmax = FLT_MAX;
 
-        if (ray.direction.x != 0.0f) {
+        if (ray.direction.x != 0.0f)
+        {
             float invD = 1.0f / ray.direction.x;
             float t0 = (A.x - ray.origin.x) * invD;
             float t1 = (B.x - ray.origin.x) * invD;
-            if (invD < 0.0f) {
+            if (invD < 0.0f)
+            {
                 float temp = t0;
                 t0 = t1;
                 t1 = temp;
@@ -57,15 +64,16 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
             tmin = fmaxf(tmin, t0);
             tmax = fminf(tmax, t1);
         }
-        else if (ray.origin.x < A.x || ray.origin.x > B.x) {
+        else if (ray.origin.x < A.x || ray.origin.x > B.x)
             return info;
-        }
 
-        if (ray.direction.y != 0.0f) {
+        if (ray.direction.y != 0.0f)
+        {
             float invD = 1.0f / ray.direction.y;
             float t0 = (A.y - ray.origin.y) * invD;
             float t1 = (B.y - ray.origin.y) * invD;
-            if (invD < 0.0f) {
+            if (invD < 0.0f)
+            {
                 float temp = t0;
                 t0 = t1;
                 t1 = temp;
@@ -73,15 +81,16 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
             tmin = fmaxf(tmin, t0);
             tmax = fminf(tmax, t1);
         }
-        else if (ray.origin.y < A.y || ray.origin.y > B.y) {
+        else if (ray.origin.y < A.y || ray.origin.y > B.y)
             return info;
-        }
 
-        if (ray.direction.z != 0.0f) {
+        if (ray.direction.z != 0.0f)
+        {
             float invD = 1.0f / ray.direction.z;
             float t0 = (A.z - ray.origin.z) * invD;
             float t1 = (B.z - ray.origin.z) * invD;
-            if (invD < 0.0f) {
+            if (invD < 0.0f)
+            {
                 float temp = t0;
                 t0 = t1;
                 t1 = temp;
@@ -89,9 +98,8 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
             tmin = fmaxf(tmin, t0);
             tmax = fminf(tmax, t1);
         }
-        else if (ray.origin.z < A.z || ray.origin.z > B.z) {
+        else if (ray.origin.z < A.z || ray.origin.z > B.z)
             return info;
-        }
 
         if (tmax < tmin)
             continue;
@@ -99,7 +107,8 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
         if (tmin < 0.0f)
             continue;
 
-        if (tmin < info.closest_t) {
+        if (tmin < info.closest_t)
+        {
             info.didHit = true;
             info.closest_t = tmin;
             info.hitLocation = ray.origin + (ray.direction * tmin);
@@ -114,10 +123,12 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
     return info;
 }
 
-__device__ inline HitInfo raySpheresIntersection(const Ray& ray, const World& world) {
+__device__ inline HitInfo raySpheresIntersection(const Ray& ray, const World& world)
+{
     HitInfo info;
 
-    for (int i = 0; i < world.spheres.numSpheres; i++) {
+    for (int i = 0; i < world.spheres.numSpheres; i++)
+    {
         Vec3 V = ray.origin - world.spheres.deviceSpheres[i].position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
@@ -134,7 +145,8 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, const World& wo
         if (t <= 0.0f)
             continue;
 
-        if (t < info.closest_t) {
+        if (t < info.closest_t)
+        {
             info.closest_t = t;
             info.didHit = true;
             info.hitLocation = ray.origin + (ray.direction * t);
@@ -149,7 +161,8 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, const World& wo
     return info;
 }
 
-__device__ inline Vec3 environmentLight(const Ray& ray, const World& world) {
+__device__ inline Vec3 environmentLight(const Ray& ray, const World& world)
+{
     float zenithHorizonGradient = pow(smoothstep(0.0f, 0.5f, ray.direction.y), world.sky.horizonExponent);
     float sunMask = pow(fmaxf(0.0f, dot(ray.direction, world.sky.sunDirection)), world.sky.sunExponent);
     float groundSkyGradient = smoothstep(-0.01f, 0.0f, ray.direction.y);
@@ -158,25 +171,29 @@ __device__ inline Vec3 environmentLight(const Ray& ray, const World& world) {
     return lerpVec3(world.sky.colorGround, colorSky, groundSkyGradient);
 }
 
-__device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, const World& world) {
+__device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, const World& world)
+{
     Vec3 color, light;
     color = 1.0f;
     light = 0.0f;
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++)
+    {
         HitInfo info = raySpheresIntersection(ray, world);
         HitInfo boxInfo = rayBoxesIntersection(ray, world);
 
         if (boxInfo.closest_t < info.closest_t)
             info = boxInfo;
     
-        if (!info.didHit) {
+        if (!info.didHit)
+        {
             if (world.sky.toggleSky)
                 light = environmentLight(ray, world);
             break;
         }
     
-        if (info.hitIsLightSource) {
+        if (info.hitIsLightSource)
+        {
             light = info.hitColor * info.hitLightIntensity;
             break;
         }
@@ -195,7 +212,8 @@ __device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, const Wor
     return color * light;
 }
 
-__device__ inline void frameAccumulation(Vec3 newColor, const Thread& thread, World& world) {
+__device__ inline void frameAccumulation(Vec3 newColor, const Thread& thread, World& world)
+{
     Vec3& accumulatedColor = world.buffer.accumulatedFrameBuffer[thread.index];
     
     if (world.buffer.numAccumulatedFrames == 0)
@@ -210,7 +228,8 @@ __device__ inline void frameAccumulation(Vec3 newColor, const Thread& thread, Wo
     world.pixels[thread.index] = make_uchar4(r, g, b, 255);
 }
 
-__global__ inline void mainKernel(World world) {
+__global__ inline void mainKernel(World world)
+{
     Thread thread = getThread(world.screenWidth, world.screenHeight, world.buffer.deviceHashArray);
     if (thread.index == -1)
         return;

@@ -18,9 +18,10 @@ int main()
     initializeBoxes(world.boxes);
 
     FrameRateTracker frameRateTracker;
-
     char fileName[24] = "";
-    while (!glfwWindowShouldClose(opengl.window)) {
+
+    while (!glfwWindowShouldClose(opengl.window))
+    {
         frameRateTracker.update();
         selectSphere(opengl, world);
         launchCudaKernel(opengl, world);

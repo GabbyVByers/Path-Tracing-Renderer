@@ -2,12 +2,14 @@
 
 #include "opengl.h"
 
-inline int mouseSpheresIntersection(const Ray& ray, const World& world) {
+inline int mouseSpheresIntersection(const Ray& ray, const World& world)
+{
     HitInfo info;
     float closest_t = FLT_MAX;
     int index = -1;
 
-    for (int i = 0; i < world.spheres.numSpheres; i++) {
+    for (int i = 0; i < world.spheres.numSpheres; i++)
+    {
         Vec3 V = ray.origin - world.spheres.hostSpheres[i].position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
@@ -26,7 +28,8 @@ inline int mouseSpheresIntersection(const Ray& ray, const World& world) {
 
         info.didHit = true;
 
-        if (t < closest_t) {
+        if (t < closest_t)
+        {
             closest_t = t;
             index = i;
         }
@@ -35,7 +38,8 @@ inline int mouseSpheresIntersection(const Ray& ray, const World& world) {
     return index;
 }
 
-inline void selectSphere(Opengl& opengl, World& world) {
+inline void selectSphere(Opengl& opengl, World& world)
+{
     if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS)
         return;
 

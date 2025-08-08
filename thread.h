@@ -3,7 +3,8 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
-struct Thread {
+struct Thread
+{
     int index = -1;
     int screenWidth = 0;
     int screenHeight = 0;
@@ -12,15 +13,14 @@ struct Thread {
     unsigned int* hashPtr = nullptr;
 };
 
-__device__ inline Thread getThread(const int& width, const int height, unsigned int* deviceHashArray) {
+__device__ inline Thread getThread(const int& width, const int height, unsigned int* deviceHashArray)
+{
     Thread thread;
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
     thread.index = -1;
     if ((x < width) && (y < height))
-    {
         thread.index = y * width + x;
-    }
     thread.screenWidth = width;
     thread.screenHeight = height;
     thread.u = ((x / (float)width) * 2.0f - 1.0f) * (width / (float)height);

@@ -4,7 +4,8 @@
 #include "boxes.h"
 #include "utilities.h"
 
-struct Camera {
+struct Camera
+{
     Vec3 position = { 0.0f, 0.0f, -5.0f };
     Vec3 direction = { 0.0f, 0.0f, 1.0f };
     Vec3 up;
@@ -12,7 +13,8 @@ struct Camera {
     float depth = 1.5f;
 };
 
-struct Sky {
+struct Sky
+{
     bool toggleSky = true;
     Vec3 sunDirection = returnNormalized({ 1.0f, 1.0f, 1.0f });
     float sunIntensity = 20.0f;
@@ -25,13 +27,15 @@ struct Sky {
     Vec3 colorGround  = rgb( 79, 112,  76);
 };
 
-struct Buffer {
+struct Buffer
+{
     int numAccumulatedFrames = 0;
     Vec3* accumulatedFrameBuffer;
     unsigned int* deviceHashArray = nullptr;
 };
 
-struct World {   
+struct World
+{   
     uchar4* pixels = nullptr;
     int screenWidth = 0;
     int screenHeight = 0;
@@ -43,7 +47,8 @@ struct World {
     Buffer buffer;
 };
 
-inline void fixCamera(Camera& camera) {
+inline void fixCamera(Camera& camera)
+{
     const Vec3 up = { 0.0f, 1.0f, 0.0f };
     normalize(camera.direction);
     camera.right = cross(camera.direction, up);
@@ -52,10 +57,12 @@ inline void fixCamera(Camera& camera) {
     normalize(camera.up);
 }
 
-inline void buildHashArrayAndFrameBuffer(Buffer& buffer, int screenSize) {
+inline void buildHashArrayAndFrameBuffer(Buffer& buffer, int screenSize)
+{
     unsigned int* hostHashArray = nullptr;
     hostHashArray = new unsigned int[screenSize];
-    for (int i = 0; i < screenSize; i++) {
+    for (int i = 0; i < screenSize; i++)
+    {
         unsigned int hash = i;
         hash_uint32(hash);
         hostHashArray[i] = hash;

@@ -10,7 +10,8 @@
 
 #include <iostream>
 
-struct Opengl {
+struct Opengl
+{
     int screenWidth = 0;
     int screenHeight = 0;
     GLuint textureId = 0;
@@ -27,19 +28,23 @@ struct Opengl {
     double prevMouseY = 0.0f;
 };
 
-inline void setupOpengl(Opengl& opengl, int screenWidth, int screenHeight, std::string title, bool fullScreen) {
+inline void setupOpengl(Opengl& opengl, int screenWidth, int screenHeight, std::string title, bool fullScreen)
+{
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    if (fullScreen) {
+    if (fullScreen)
+    {
         opengl.primary = glfwGetPrimaryMonitor();
         opengl.screenWidth = glfwGetVideoMode(opengl.primary)->width;
         opengl.screenHeight = glfwGetVideoMode(opengl.primary)->height;
         opengl.window = glfwCreateWindow(opengl.screenWidth, opengl.screenHeight, title.c_str(), opengl.primary, nullptr);
-    } else {
+    }
+    else
+    {
         opengl.screenWidth = screenWidth;
         opengl.screenHeight = screenHeight;
         opengl.window = glfwCreateWindow(opengl.screenWidth, opengl.screenHeight, title.c_str(), nullptr, nullptr);
@@ -96,7 +101,8 @@ inline void setupOpengl(Opengl& opengl, int screenWidth, int screenHeight, std::
     glDeleteShader(vert);
     glDeleteShader(frag);
 
-    float quadVertices[] = {
+    float quadVertices[] =
+    {
         -1.0f,  1.0f,   0.0f, 1.0f,
         -1.0f, -1.0f,   0.0f, 0.0f,
          1.0f, -1.0f,   1.0f, 0.0f,
@@ -119,7 +125,8 @@ inline void setupOpengl(Opengl& opengl, int screenWidth, int screenHeight, std::
     return;
 }
 
-inline void freeOpengl(Opengl& opengl) {
+inline void freeOpengl(Opengl& opengl)
+{
     cudaGraphicsUnregisterResource(opengl.cudaPBO);
     glDeleteBuffers(1, &opengl.PBO);
     glDeleteTextures(1, &opengl.textureId);
@@ -130,7 +137,8 @@ inline void freeOpengl(Opengl& opengl) {
     glfwTerminate();
 }
 
-inline void launchCudaKernel(Opengl& opengl, World& world) {
+inline void launchCudaKernel(Opengl& opengl, World& world)
+{
     size_t size;
     cudaGraphicsMapResources(1, &opengl.cudaPBO, 0);
     cudaGraphicsResourceGetMappedPointer((void**)&world.pixels, &size, opengl.cudaPBO);
@@ -142,7 +150,8 @@ inline void launchCudaKernel(Opengl& opengl, World& world) {
     mainKernel <<<GRID, BLOCK>>> (world);
 }
 
-inline void renderScreen(Opengl& opengl) {
+inline void renderScreen(Opengl& opengl)
+{
     cudaGraphicsUnmapResources(1, &opengl.cudaPBO, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, opengl.PBO);
     glBindTexture(GL_TEXTURE_2D, opengl.textureId);
@@ -155,14 +164,16 @@ inline void renderScreen(Opengl& opengl) {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-inline void finishRendering(Opengl& opengl) {
+inline void finishRendering(Opengl& opengl)
+{
     glfwSwapBuffers(opengl.window);
     glfwPollEvents();
     if (glfwGetKey(opengl.window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(opengl.window, true);
 }
 
-inline int screenSize(const Opengl& opengl) {
+inline int screenSize(const Opengl& opengl)
+{
     return opengl.screenWidth * opengl.screenHeight;
 }
 

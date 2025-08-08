@@ -4,7 +4,8 @@
 #include <fstream>
 #include <string>
 
-inline void saveSpheres(World& world, char fileName[24]) {
+inline void saveSpheres(World& world, char fileName[24])
+{
 	size_t sizeBytes = sizeof(Sphere) * world.spheres.numSpheres;
 	unsigned char* saveData = new unsigned char[sizeBytes];
 	memcpy(saveData, world.spheres.hostSpheres, sizeBytes);
@@ -21,7 +22,8 @@ inline void saveSpheres(World& world, char fileName[24]) {
 	delete[] saveData;
 }
 
-inline void loadSpheres(World& world, char fileName[24]) {
+inline void loadSpheres(World& world, char fileName[24])
+{
 	std::string realFileName(fileName, sizeof(fileName));
 	realFileName = "saves/" + realFileName + ".bin";
 	std::ifstream inFile(realFileName, std::ios::binary);

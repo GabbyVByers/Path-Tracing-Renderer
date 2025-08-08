@@ -2,7 +2,8 @@
 
 #include "vec3.h"
 
-struct Sphere {
+struct Sphere
+{
     Vec3 position = { 0.0f, 0.0f, 0.0f };
     float radius = 1.0f;
     Vec3 color = rgb(255, 255, 255);
@@ -12,22 +13,26 @@ struct Sphere {
     float lightIntensity = 1.0f;
 };
 
-struct Spheres {
+struct Spheres
+{
     int numSpheres = 0;
     Sphere* hostSpheres = nullptr;
     Sphere* deviceSpheres = nullptr;
 };
 
-inline void updateSpheresOnGpu(Spheres& spheres) {
+inline void updateSpheresOnGpu(Spheres& spheres)
+{
     cudaMemcpy(spheres.deviceSpheres, spheres.hostSpheres, sizeof(Sphere) * spheres.numSpheres, cudaMemcpyHostToDevice);
 }
 
-inline void freeSpheres(Spheres& spheres) {
+inline void freeSpheres(Spheres& spheres)
+{
     delete[] spheres.hostSpheres;
     cudaFree(spheres.deviceSpheres);
 }
 
-inline void initializeSpheres(Spheres& spheres) {
+inline void initializeSpheres(Spheres& spheres)
+{
     spheres.numSpheres = 1;
     spheres.hostSpheres = nullptr;
     spheres.hostSpheres = new Sphere[spheres.numSpheres];
