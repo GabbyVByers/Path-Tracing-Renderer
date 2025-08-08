@@ -21,7 +21,7 @@ struct Ray {
 };
 
 __device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B) {
-    const float epsilon = 0.0001f;
+    const float epsilon = 0.001f;
 
     if (fabs(hitLocation.x - A.x) < epsilon) return { -1.0f, 0.0f, 0.0f };
     if (fabs(hitLocation.x - B.x) < epsilon) return {  1.0f, 0.0f, 0.0f };
@@ -35,7 +35,6 @@ __device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B) {
     // something terrible has happened
     return { 0.0f, 0.0f, 0.0f };
 }
-
 
 __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& world) {
     HitInfo info;
@@ -101,6 +100,9 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
         if (tmax < tmin)
             continue;
 
+        if (tmin < 0.0f)
+            continue;
+
         if (tmin < info.closest_t) {
             info.didHit = true;
             info.closest_t = tmin;
@@ -164,8 +166,6 @@ __device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, const Wor
     Vec3 color, light;
     color = 1.0f;
     light = 0.0f;
-
-    Ray cameraRay = ray;
 
     for (int i = 0; i < 50; i++) {
         HitInfo info = rayBoxesIntersection(ray, world);
