@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="saving.h" />
+    <CudaCompile Include="framerate.h" />
     <ClInclude Include="selector.h" />
     <CudaCompile Include="spheres.h" />
     <CudaCompile Include="input.h" />

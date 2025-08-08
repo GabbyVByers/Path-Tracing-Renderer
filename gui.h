@@ -6,6 +6,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "saving.h"
+#include "framerate.h"
 
 inline void setup_imgui(GLFWwindow* window)
 {
@@ -20,7 +21,7 @@ inline void setup_imgui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-inline void draw_imgui(World& world, char file_name[24])
+inline void draw_imgui(World& world, char file_name[24], int fps)
 {
 
     Sphere* selected_host_sphere = nullptr;
@@ -41,6 +42,7 @@ inline void draw_imgui(World& world, char file_name[24])
     ImGui::NewFrame();
     
     ImGui::Begin("DEBUGGER");
+    ImGui::Text("Frames Per Second: %d", fps);
     ImGui::Text("Accumulated Frames: %d", world.buffer.num_accumulated_frames);
 
     ImGui::Text(" ");

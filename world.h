@@ -5,8 +5,8 @@
 
 struct Camera
 {
-    Vec3 position = { 11.3f, 8.0f, -10.0f };
-    Vec3 direction = { -0.5f, -0.5f, 0.7f };
+    Vec3 position = { 0.0f, 0.0f, -5.0f };
+    Vec3 direction = { 0.0f, 0.0f, 1.0f };
     Vec3 up;
     Vec3 right;
     float depth = 1.5f;
