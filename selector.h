@@ -89,18 +89,20 @@ inline SimpleHitInfo mouseBoxesIntersection(const Ray& ray, const World& world)
     return info;
 }
 
-inline SimpleHitInfo mouseSpheresIntersection(const Ray& ray, const World& world)
+inline SimpleHitInfo mouseSpheresIntersection(const Ray& ray, World& world)
 {
     SimpleHitInfo info;
     info.hit_t = FLT_MAX;
     info.hit_index = -1;
 
-    for (int i = 0; i < world.spheres.numSpheres; i++)
+    for (int i = 0; i < world.spheres.getSize(); i++)
     {
-        Vec3 V = ray.origin - world.spheres.hostSpheres[i].position;
+        Sphere* hostSpherePointer = world.spheres.getHostPtrAtIndex(i);
+
+        Vec3 V = ray.origin - hostSpherePointer->position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
-        float c = dot(V, V) - (world.spheres.hostSpheres[i].radius * world.spheres.hostSpheres[i].radius);
+        float c = dot(V, V) - (hostSpherePointer->radius * hostSpherePointer->radius);
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
@@ -128,8 +130,8 @@ inline void selectSphere(Opengl& opengl, World& world)
     if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS)
         return;
 
-    for (int i = 0; i < world.spheres.numSpheres; i++)
-        world.spheres.hostSpheres[i].isSelected = false;
+    for (int i = 0; i < world.spheres.getSize(); i++)
+        world.spheres.getHostPtrAtIndex(i)->isSelected = false;
 
     for (int i = 0; i < world.boxes.numBoxes; i++)
         world.boxes.hostBoxes[i].isSelected = false;
@@ -150,8 +152,8 @@ inline void selectSphere(Opengl& opengl, World& world)
     
     if (sphereInfo.hit_t < boxInfo.hit_t)
     {
-        world.spheres.hostSpheres[sphereInfo.hit_index].isSelected = true;
-        updateSpheresOnGpu(world.spheres);
+        world.spheres.getHostPtrAtIndex(sphereInfo.hit_index)->isSelected = true;
+        world.spheres.updateHostToDevice();
         return;
     }
 

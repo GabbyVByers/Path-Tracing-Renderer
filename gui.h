@@ -24,11 +24,11 @@ inline void setupImgui(GLFWwindow* window)
 inline void drawImgui(World& world, char fileName[24], int fps)
 {
     Sphere* selectedHostSphere = nullptr;
-    for (int i = 0; i < world.spheres.numSpheres; i++)
+    for (int i = 0; i < world.spheres.getSize(); i++)
     {
-        if (world.spheres.hostSpheres[i].isSelected == true)
+        if (world.spheres.getHostPtrAtIndex(i)->isSelected == true)
         {
-            selectedHostSphere = &world.spheres.hostSpheres[i];
+            selectedHostSphere = world.spheres.getHostPtrAtIndex(i);
             break;
         }
     }
@@ -98,7 +98,7 @@ inline void drawImgui(World& world, char fileName[24], int fps)
             selectedHostSphere->isLightSource = !selectedHostSphere->isLightSource;
         ImGui::SliderFloat("Intensity", &selectedHostSphere->lightIntensity, 0.0f, 35.0f);
 
-        updateSpheresOnGpu(world.spheres);
+        world.spheres.updateHostToDevice();
         ImGui::End();
     }
 

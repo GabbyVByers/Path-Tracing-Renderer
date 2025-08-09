@@ -6,7 +6,7 @@
 
 int main()
 {
-    const bool FULLSCREEN = true;
+    const bool FULLSCREEN = false;
     Opengl opengl;
     setupOpengl(opengl, 1920, 1080, "CUDA-Powered Path-Tracing", FULLSCREEN);
     setupImgui(opengl.window);
@@ -14,8 +14,10 @@ int main()
     World world;
     fixCamera(world.camera);
     buildHashArrayAndFrameBuffer(world.buffer, screenSize(opengl));
-    initializeSpheres(world.spheres);
     initializeBoxes(world.boxes);
+
+    Sphere sphere;
+    world.spheres.add(sphere);
 
     FrameRateTracker frameRateTracker;
     char fileName[24] = "";
@@ -31,7 +33,6 @@ int main()
         finishRendering(opengl);
     }
 
-    freeSpheres(world.spheres);
     freeBoxes(world.boxes);
     freeOpengl(opengl);
     return 0;

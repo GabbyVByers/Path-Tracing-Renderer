@@ -123,16 +123,18 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
     return info;
 }
 
-__device__ inline HitInfo raySpheresIntersection(const Ray& ray, const World& world)
+__device__ inline HitInfo raySpheresIntersection(const Ray& ray, World& world)
 {
     HitInfo info;
 
-    for (int i = 0; i < world.spheres.numSpheres; i++)
+    for (int i = 0; i < world.spheres.getSize(); i++)
     {
-        Vec3 V = ray.origin - world.spheres.deviceSpheres[i].position;
+        Sphere* deviceSpherePointer = world.spheres.getDevicePtrAtIndex(i);
+
+        Vec3 V = ray.origin - deviceSpherePointer->position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
-        float c = dot(V, V) - (world.spheres.deviceSpheres[i].radius * world.spheres.deviceSpheres[i].radius);
+        float c = dot(V, V) - (deviceSpherePointer->radius * deviceSpherePointer->radius);
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
@@ -150,11 +152,11 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, const World& wo
             info.closest_t = t;
             info.didHit = true;
             info.hitLocation = ray.origin + (ray.direction * t);
-            info.hitColor = world.spheres.deviceSpheres[i].color;
-            info.hitNormal = info.hitLocation - world.spheres.deviceSpheres[i].position; normalize(info.hitNormal);
-            info.hitRoughness = world.spheres.deviceSpheres[i].roughness;
-            info.hitIsLightSource = world.spheres.deviceSpheres[i].isLightSource;
-            info.hitLightIntensity = world.spheres.deviceSpheres[i].lightIntensity;
+            info.hitColor = deviceSpherePointer->color;
+            info.hitNormal = info.hitLocation - deviceSpherePointer->position; normalize(info.hitNormal);
+            info.hitRoughness = deviceSpherePointer->roughness;
+            info.hitIsLightSource = deviceSpherePointer->isLightSource;
+            info.hitLightIntensity = deviceSpherePointer->lightIntensity;
         }
     }
 
@@ -171,7 +173,7 @@ __device__ inline Vec3 environmentLight(const Ray& ray, const World& world)
     return lerpVec3(world.sky.colorGround, colorSky, groundSkyGradient);
 }
 
-__device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, const World& world)
+__device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, World& world)
 {
     Vec3 color, light;
     color = 1.0f;

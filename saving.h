@@ -6,9 +6,9 @@
 
 inline void saveSpheres(World& world, char fileName[24])
 {
-	size_t sizeBytes = sizeof(Sphere) * world.spheres.numSpheres;
+	size_t sizeBytes = sizeof(Sphere) * world.spheres.getSize();
 	unsigned char* saveData = new unsigned char[sizeBytes];
-	memcpy(saveData, world.spheres.hostSpheres, sizeBytes);
+	memcpy(saveData, world.spheres.getHostPtrAtIndex(0), sizeBytes);
 
 	std::string realFileName(&fileName[0], sizeof(fileName));
 	realFileName = "saves/" + realFileName + ".bin";
@@ -41,13 +41,21 @@ inline void loadSpheres(World& world, char fileName[24])
 
 	int numSpheres = sizeBytes / sizeof(Sphere);
 
-	freeSpheres(world.spheres);
+	world.spheres.clear();
 
-	world.spheres.numSpheres = numSpheres;
-	world.spheres.hostSpheres = new Sphere[numSpheres];
-	cudaMalloc((void**)&world.spheres.deviceSpheres, sizeof(Sphere) * numSpheres);
+	for (int i = 0; i < numSpheres; i++)
+	{
+		Sphere sphere = ((Sphere*)saveData)[i];
+		world.spheres.add(sphere);
+	}
 
-	memcpy(world.spheres.hostSpheres, saveData, sizeBytes);
-	updateSpheresOnGpu(world.spheres);
+	//freeSpheres(world.spheres);
+	//
+	//world.spheres.numSpheres = numSpheres;
+	//world.spheres.hostSpheres = new Sphere[numSpheres];
+	//cudaMalloc((void**)&world.spheres.deviceSpheres, sizeof(Sphere) * numSpheres);
+	//
+	//memcpy(world.spheres.hostSpheres, saveData, sizeBytes);
+	//updateSpheresOnGpu(world.spheres);
 }
 

@@ -5,7 +5,7 @@
 struct Box
 {
     Vec3 boxMin = { -2.0f, -2.0f, -2.0f };
-	Vec3 boxMax = { 2.0f, 2.0f, 2.0f };
+	Vec3 boxMax = { 2.0f, -1.9f, 2.0f };
     Vec3 color = rgb(255, 33, 255);
     float roughness = 0.8f;
     bool isSelected = false;
