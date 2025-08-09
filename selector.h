@@ -2,10 +2,17 @@
 
 #include "opengl.h"
 
-inline int mouseBoxesIntersection(const Ray& ray, const World& world)
+struct SimpleHitInfo
 {
-    float closest_t = FLT_MAX;
-    int index = -1;
+    float hit_t;
+    int hit_index;
+};
+
+inline SimpleHitInfo mouseBoxesIntersection(const Ray& ray, const World& world)
+{
+    SimpleHitInfo info;
+    info.hit_t = FLT_MAX;
+    info.hit_index = -1;
 
     for (int i = 0; i < world.boxes.numBoxes; i++)
     {
@@ -30,7 +37,7 @@ inline int mouseBoxesIntersection(const Ray& ray, const World& world)
             tmax = fminf(tmax, t1);
         }
         else if (ray.origin.x < A.x || ray.origin.x > B.x)
-            return -1;
+            return info;
 
         if (ray.direction.y != 0.0f)
         {
@@ -47,7 +54,7 @@ inline int mouseBoxesIntersection(const Ray& ray, const World& world)
             tmax = fminf(tmax, t1);
         }
         else if (ray.origin.y < A.y || ray.origin.y > B.y)
-            return -1;
+            return info;
 
         if (ray.direction.z != 0.0f)
         {
@@ -64,7 +71,7 @@ inline int mouseBoxesIntersection(const Ray& ray, const World& world)
             tmax = fminf(tmax, t1);
         }
         else if (ray.origin.z < A.z || ray.origin.z > B.z)
-            return -1;
+            return info;
 
         if (tmax < tmin)
             continue;
@@ -72,20 +79,21 @@ inline int mouseBoxesIntersection(const Ray& ray, const World& world)
         if (tmin < 0.0f)
             continue;
 
-        if (tmin < closest_t)
+        if (tmin < info.hit_t)
         {
-            closest_t = tmin;
-            index = i;
+            info.hit_t = tmin;
+            info.hit_index = i;
         }
     }
 
-    return index;
+    return info;
 }
 
-inline int mouseSpheresIntersection(const Ray& ray, const World& world)
+inline SimpleHitInfo mouseSpheresIntersection(const Ray& ray, const World& world)
 {
-    float closest_t = FLT_MAX;
-    int index = -1;
+    SimpleHitInfo info;
+    info.hit_t = FLT_MAX;
+    info.hit_index = -1;
 
     for (int i = 0; i < world.spheres.numSpheres; i++)
     {
@@ -105,14 +113,14 @@ inline int mouseSpheresIntersection(const Ray& ray, const World& world)
         if (t <= 0.0f)
             continue;
 
-        if (t < closest_t)
+        if (t < info.hit_t)
         {
-            closest_t = t;
-            index = i;
+            info.hit_t = t;
+            info.hit_index = i;
         }
     }
 
-    return index;
+    return info;
 }
 
 inline void selectSphere(Opengl& opengl, World& world)
@@ -137,15 +145,22 @@ inline void selectSphere(Opengl& opengl, World& world)
     mouseRay.origin = world.camera.position;
     mouseRay.direction = (world.camera.direction * world.camera.depth) + (world.camera.right * u) + (world.camera.up * v);
 
-    int mouseSphereIndex = mouseSpheresIntersection(mouseRay, world);
-    if (mouseSphereIndex != -1)
-        world.spheres.hostSpheres[mouseSphereIndex].isSelected = true;
+    SimpleHitInfo sphereInfo = mouseSpheresIntersection(mouseRay, world);
+    SimpleHitInfo boxInfo = mouseBoxesIntersection(mouseRay, world);
+    
+    if (sphereInfo.hit_t < boxInfo.hit_t)
+    {
+        world.spheres.hostSpheres[sphereInfo.hit_index].isSelected = true;
+        updateSpheresOnGpu(world.spheres);
+        return;
+    }
 
-    int mouseBoxesIndex = mouseBoxesIntersection(mouseRay, world);
-    if (mouseBoxesIndex != -1)
-        world.boxes.hostBoxes[mouseBoxesIndex].isSelected = true;
+    else if (boxInfo.hit_t < sphereInfo.hit_t)
+    {
+        world.boxes.hostBoxes[boxInfo.hit_index].isSelected = true;
+        updateBoxesOnGpu(world.boxes);
+    }
 
-    updateSpheresOnGpu(world.spheres);
-    updateBoxesOnGpu(world.boxes);
+    return;
 }
 
