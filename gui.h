@@ -33,6 +33,16 @@ inline void drawImgui(World& world, char fileName[24], int fps)
         }
     }
 
+    Box* selectedHostBox = nullptr;
+    for (int i = 0; i < world.boxes.numBoxes; i++)
+    {
+        if (world.boxes.hostBoxes[i].isSelected == true)
+        {
+            selectedHostBox = &world.boxes.hostBoxes[i];
+            break;
+        }
+    }
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
 
@@ -88,9 +98,32 @@ inline void drawImgui(World& world, char fileName[24], int fps)
             selectedHostSphere->isLightSource = !selectedHostSphere->isLightSource;
         ImGui::SliderFloat("Intensity", &selectedHostSphere->lightIntensity, 0.0f, 35.0f);
 
-        ImGui::End();
-
         updateSpheresOnGpu(world.spheres);
+        ImGui::End();
+    }
+
+    if (selectedHostBox != nullptr)
+    {
+        ImGui::Begin("Selected Box");
+
+        if (ImGui::Button("Deselect Box"))
+            selectedHostBox->isSelected = false;
+
+        ImGui::Text(" ");
+        ImGui::DragFloat3("Position Min", (float*)&selectedHostBox->boxMin, 0.05f);
+        ImGui::DragFloat3("Position Max", (float*)&selectedHostBox->boxMax, 0.05f);
+
+        ImGui::Text(" ");
+        ImGui::SliderFloat("Roughness", &selectedHostBox->roughness, 0.0f, 1.0f);
+        ImGui::ColorEdit3("Color", (float*)&selectedHostBox->color);
+
+        ImGui::Text(" ");
+        if (ImGui::Button("Toggle Light Source"))
+            selectedHostBox->isLightSource = !selectedHostBox->isLightSource;
+        ImGui::SliderFloat("Intensity", &selectedHostBox->lightIntensity, 0.0f, 35.0f);
+
+        updateBoxesOnGpu(world.boxes);
+        ImGui::End();
     }
 
     ImGui::End();

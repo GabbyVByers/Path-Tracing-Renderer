@@ -32,6 +32,7 @@ int main()
     }
 
     freeSpheres(world.spheres);
+    freeBoxes(world.boxes);
     freeOpengl(opengl);
     return 0;
 }
