@@ -34,8 +34,8 @@ public:
 
 	~SharedArray()
 	{
-		delete[] hostPointer;
-		cudaFree(devicePointer);
+		//delete[] hostPointer;
+		//cudaFree(devicePointer);
 	}
 
 	void doubleCapacity()
