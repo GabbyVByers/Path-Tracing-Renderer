@@ -1,6 +1,10 @@
 #pragma once
 
 #include "cuda_runtime.h"
+#include "iostream"
+
+#define HOST = 0;
+#define DEVICE = 1;
 
 /*
 	A utility for managing an array of elements between the Host and Device
@@ -30,12 +34,6 @@ public:
 	{
 		hostPointer = new type[capacity];
 		cudaMalloc((void**)&devicePointer, sizeof(type) * capacity);
-	}
-
-	~SharedArray()
-	{
-		//delete[] hostPointer;
-		//cudaFree(devicePointer);
 	}
 
 	void doubleCapacity()
@@ -74,8 +72,6 @@ public:
 			hostPointer[i - 1] = hostPointer[i];
 		}
 		size--;
-
-		updateHostToDevice();
 	}
 
 	void add(type element)
@@ -85,8 +81,6 @@ public:
 
 		hostPointer[size] = element;
 		size++;
-
-		updateHostToDevice();
 	}
 
 	void clear()
@@ -111,14 +105,16 @@ public:
 		cudaMemcpy(hostPointer, devicePointer, size * sizeof(type), cudaMemcpyDeviceToHost);
 	}
 
-	type* getHostPtrAtIndex(size_t index)
+	__host__ __device__ type operator[](size_t index, int TARGET)
 	{
-		return &hostPointer[index];
-	}
-
-	__device__ type* getDevicePtrAtIndex(size_t index)
-	{
-		return &devicePointer[index];
+		if (TARGET == HOST)
+		{
+			return hostPointer[index];
+		}
+		if (TARGET == DEVICE)
+		{
+			return devicePointer[index];
+		}
 	}
 
 	__host__ __device__ size_t getSize() const

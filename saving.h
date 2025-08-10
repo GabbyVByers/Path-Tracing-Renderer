@@ -49,6 +49,8 @@ inline void loadSpheres(World& world, char fileName[24])
 		world.spheres.add(sphere);
 	}
 
+	world.spheres.updateHostToDevice();
+
 	//freeSpheres(world.spheres);
 	//
 	//world.spheres.numSpheres = numSpheres;

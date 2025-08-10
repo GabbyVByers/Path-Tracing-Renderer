@@ -18,6 +18,7 @@ int main()
 
     Sphere sphere;
     world.spheres.add(sphere);
+    world.spheres.updateHostToDevice();
 
     FrameRateTracker frameRateTracker;
     char fileName[24] = "";
