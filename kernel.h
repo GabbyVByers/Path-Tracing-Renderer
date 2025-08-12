@@ -42,10 +42,10 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
 {
     HitInfo info;
 
-    for (int i = 0; i < world.boxes.numBoxes; i++)
+    for (int i = 0; i < world.boxes.size; i++)
     {
-        const Vec3& A = world.boxes.deviceBoxes[i].boxMin;
-        const Vec3& B = world.boxes.deviceBoxes[i].boxMax;
+        const Vec3& A = world.boxes.devicePointer[i].boxMin;
+        const Vec3& B = world.boxes.devicePointer[i].boxMax;
         
         float tmin = -FLT_MAX;
         float tmax = FLT_MAX;
@@ -112,11 +112,11 @@ __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& worl
             info.didHit = true;
             info.closest_t = tmin;
             info.hitLocation = ray.origin + (ray.direction * tmin);
-            info.hitColor = world.boxes.deviceBoxes[i].color;
+            info.hitColor = world.boxes.devicePointer[i].color;
             info.hitNormal = getBoxNormal(info.hitLocation, A, B);
-            info.hitRoughness = world.boxes.deviceBoxes[i].roughness;
-            info.hitIsLightSource = world.boxes.deviceBoxes[i].isLightSource;
-            info.hitLightIntensity = world.boxes.deviceBoxes[i].lightIntensity;
+            info.hitRoughness = world.boxes.devicePointer[i].roughness;
+            info.hitIsLightSource = world.boxes.devicePointer[i].isLightSource;
+            info.hitLightIntensity = world.boxes.devicePointer[i].lightIntensity;
         }
     }
 
@@ -127,14 +127,14 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, World& world)
 {
     HitInfo info;
 
-    for (int i = 0; i < world.spheres.getSize(); i++)
+    for (int i = 0; i < world.spheres.size; i++)
     {
-        Sphere* deviceSpherePointer = world.spheres.getDevicePtrAtIndex(i);
+        Sphere& deviceSpherePointer = world.spheres.devicePointer[i];
 
-        Vec3 V = ray.origin - deviceSpherePointer->position;
+        Vec3 V = ray.origin - deviceSpherePointer.position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
-        float c = dot(V, V) - (deviceSpherePointer->radius * deviceSpherePointer->radius);
+        float c = dot(V, V) - (deviceSpherePointer.radius * deviceSpherePointer.radius);
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
@@ -152,11 +152,11 @@ __device__ inline HitInfo raySpheresIntersection(const Ray& ray, World& world)
             info.closest_t = t;
             info.didHit = true;
             info.hitLocation = ray.origin + (ray.direction * t);
-            info.hitColor = deviceSpherePointer->color;
-            info.hitNormal = info.hitLocation - deviceSpherePointer->position; normalize(info.hitNormal);
-            info.hitRoughness = deviceSpherePointer->roughness;
-            info.hitIsLightSource = deviceSpherePointer->isLightSource;
-            info.hitLightIntensity = deviceSpherePointer->lightIntensity;
+            info.hitColor = deviceSpherePointer.color;
+            info.hitNormal = info.hitLocation - deviceSpherePointer.position; normalize(info.hitNormal);
+            info.hitRoughness = deviceSpherePointer.roughness;
+            info.hitIsLightSource = deviceSpherePointer.isLightSource;
+            info.hitLightIntensity = deviceSpherePointer.lightIntensity;
         }
     }
 
@@ -216,23 +216,23 @@ __device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, World& wo
 
 __device__ inline void frameAccumulation(Vec3 newColor, const Thread& thread, World& world)
 {
-    Vec3& accumulatedColor = world.buffer.accumulatedFrameBuffer[thread.index];
+    Vec3& accumulatedColor = world.metadata.accumulatedFrameBuffer[thread.index];
     
-    if (world.buffer.numAccumulatedFrames == 0)
+    if (world.metadata.numAccumulatedFrames == 0)
         accumulatedColor = 0.0f;
 
     accumulatedColor += newColor;
-    Vec3 thisColor = accumulatedColor / (world.buffer.numAccumulatedFrames + 1);
+    Vec3 thisColor = accumulatedColor / (world.metadata.numAccumulatedFrames + 1);
 
     unsigned char r = fminf(255.0f, thisColor.x * 255.0f);
     unsigned char g = fminf(255.0f, thisColor.y * 255.0f);
     unsigned char b = fminf(255.0f, thisColor.z * 255.0f);
-    world.pixels[thread.index] = make_uchar4(r, g, b, 255);
+    world.metadata.pixels[thread.index] = make_uchar4(r, g, b, 255);
 }
 
 __global__ inline void mainKernel(World world)
 {
-    Thread thread = getThread(world.screenWidth, world.screenHeight, world.buffer.deviceHashArray);
+    Thread thread = getThread(world.metadata.screenWidth, world.metadata.screenHeight, world.metadata.deviceHashArray);
     if (thread.index == -1)
         return;
 

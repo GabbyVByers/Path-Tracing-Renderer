@@ -23,22 +23,22 @@ inline void setupImgui(GLFWwindow* window)
 
 inline void drawImgui(World& world, char fileName[24], int fps)
 {
-    Sphere* selectedHostSphere = nullptr;
-    for (int i = 0; i < world.spheres.getSize(); i++)
+    int indexSphere = -1;
+    for (int i = 0; i < world.spheres.size; i++)
     {
-        if (world.spheres.getHostPtrAtIndex(i)->isSelected == true)
+        if (world.spheres.hostPointer[i].isSelected == true)
         {
-            selectedHostSphere = world.spheres.getHostPtrAtIndex(i);
+            indexSphere = i;
             break;
         }
     }
 
-    Box* selectedHostBox = nullptr;
-    for (int i = 0; i < world.boxes.numBoxes; i++)
+    int indexBox = -1;
+    for (int i = 0; i < world.boxes.size; i++)
     {
-        if (world.boxes.hostBoxes[i].isSelected == true)
+        if (world.boxes.hostPointer[i].isSelected == true)
         {
-            selectedHostBox = &world.boxes.hostBoxes[i];
+            indexBox = i;
             break;
         }
     }
@@ -49,18 +49,30 @@ inline void drawImgui(World& world, char fileName[24], int fps)
     ImGui::NewFrame();
     
     ImGui::Begin("DEBUGGER");
+
+    ImGui::Text(" ");
+    ImGui::Text("Camera Properties");
+    ImGui::DragFloat3("Position", (float*)&world.camera.position, 0.05f);
+    ImGui::DragFloat3("Direction", (float*)&world.camera.direction, 0.05f);
+    fixCamera(world.camera);
+
+    ImGui::Text(" ");
     ImGui::Text("Frames Per Second: %d", fps);
-    ImGui::Text("Accumulated Frames: %d", world.buffer.numAccumulatedFrames);
+    ImGui::Text("Accumulated Frames: %d", world.metadata.numAccumulatedFrames);
 
     ImGui::Text(" ");
     if (ImGui::Button("Toggle Enviroment Lighting"))
         world.sky.toggleSky = !world.sky.toggleSky;
     
+    if (ImGui::Button("Enable VSYNC"))
+        glfwSwapInterval(1);
+
+    ImGui::SameLine();
+    if (ImGui::Button("Disable VSYNC"))
+        glfwSwapInterval(0);
+
     ImGui::Text(" ");
-    ImGui::Text("SUN DIRECTION");
-    ImGui::SliderFloat("Sun.dir.x", &world.sky.sunDirection.x, -1.0f, 1.0f);
-    ImGui::SliderFloat("Sun.dir.y", &world.sky.sunDirection.y, -1.0f, 1.0f);
-    ImGui::SliderFloat("Sun.dir.z", &world.sky.sunDirection.z, -1.0f, 1.0f);
+    ImGui::DragFloat3("Sun Direction", (float*)&world.sky.sunDirection, 0.05f);
     normalize(world.sky.sunDirection);
 
     ImGui::Text(" ");
@@ -78,51 +90,75 @@ inline void drawImgui(World& world, char fileName[24], int fps)
     if (ImGui::Button("Load Geometry"))
         loadSpheres(world, fileName);
 
-    if (selectedHostSphere != nullptr)
+    if (indexSphere != -1)
     {
         ImGui::Begin("Selected Sphere");
 
         if (ImGui::Button("Deselect Sphere"))
-            selectedHostSphere->isSelected = false;
+            world.spheres.hostPointer[indexSphere].isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::SliderFloat("Radius", &selectedHostSphere->radius, 0.1f, 20.0f);
-        ImGui::DragFloat3("Position", (float*)&selectedHostSphere->position, 0.05f);
+        ImGui::SliderFloat("Radius", &world.spheres.hostPointer[indexSphere].radius, 0.1f, 20.0f);
+        ImGui::DragFloat3("Position", (float*)&world.spheres.hostPointer[indexSphere].position, 0.05f);
         
         ImGui::Text(" ");
-        ImGui::SliderFloat("Roughness", &selectedHostSphere->roughness, 0.0f, 1.0f);
-        ImGui::ColorEdit3("Color", (float*)&selectedHostSphere->color);
+        ImGui::SliderFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.0f, 1.0f);
+        ImGui::ColorEdit3("Color", (float*)&world.spheres.hostPointer[indexSphere].color);
 
         ImGui::Text(" ");
         if (ImGui::Button("Toggle Light Source"))
-            selectedHostSphere->isLightSource = !selectedHostSphere->isLightSource;
-        ImGui::SliderFloat("Intensity", &selectedHostSphere->lightIntensity, 0.0f, 35.0f);
+            world.spheres.hostPointer[indexSphere].isLightSource = !world.spheres.hostPointer[indexSphere].isLightSource;
+        ImGui::SliderFloat("Intensity", &world.spheres.hostPointer[indexSphere].lightIntensity, 0.0f, 35.0f);
+
+        ImGui::Text(" ");
+        if (ImGui::Button("Delete"))
+            world.spheres.remove(indexSphere);
+        ImGui::SameLine();
+        if (ImGui::Button("Duplicate"))
+        {
+            Sphere newSphere = world.spheres.hostPointer[indexSphere];
+            newSphere.position.y += newSphere.radius * 2.0f;
+            world.spheres.add(newSphere);
+        }
 
         world.spheres.updateHostToDevice();
         ImGui::End();
     }
 
-    if (selectedHostBox != nullptr)
+    if (indexBox != -1)
     {
         ImGui::Begin("Selected Box");
 
         if (ImGui::Button("Deselect Box"))
-            selectedHostBox->isSelected = false;
+            world.boxes.hostPointer[indexBox].isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::DragFloat3("Position Min", (float*)&selectedHostBox->boxMin, 0.05f);
-        ImGui::DragFloat3("Position Max", (float*)&selectedHostBox->boxMax, 0.05f);
+        ImGui::DragFloat3("Position Min", (float*)&world.boxes.hostPointer[indexBox].boxMin, 0.05f);
+        ImGui::DragFloat3("Position Max", (float*)&world.boxes.hostPointer[indexBox].boxMax, 0.05f);
 
         ImGui::Text(" ");
-        ImGui::SliderFloat("Roughness", &selectedHostBox->roughness, 0.0f, 1.0f);
-        ImGui::ColorEdit3("Color", (float*)&selectedHostBox->color);
+        ImGui::SliderFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.0f, 1.0f);
+        ImGui::ColorEdit3("Color", (float*)&world.boxes.hostPointer[indexBox].color);
 
         ImGui::Text(" ");
         if (ImGui::Button("Toggle Light Source"))
-            selectedHostBox->isLightSource = !selectedHostBox->isLightSource;
-        ImGui::SliderFloat("Intensity", &selectedHostBox->lightIntensity, 0.0f, 35.0f);
+            world.boxes.hostPointer[indexBox].isLightSource = !world.boxes.hostPointer[indexBox].isLightSource;
+        ImGui::SliderFloat("Intensity", &world.boxes.hostPointer[indexBox].lightIntensity, 0.0f, 35.0f);
 
-        updateBoxesOnGpu(world.boxes);
+        ImGui::Text(" ");
+        if (ImGui::Button("Delete"))
+            world.boxes.remove(indexBox);
+        ImGui::SameLine();
+        if (ImGui::Button("Duplicate"))
+        {
+            Box newBox = world.boxes.hostPointer[indexBox];
+            float offset = (newBox.boxMax.y - newBox.boxMin.y) * 1.2f;
+            newBox.boxMax.y += offset;
+            newBox.boxMin.y += offset;
+            world.boxes.add(newBox);
+        }
+
+        world.boxes.updateHostToDevice();
         ImGui::End();
     }
 

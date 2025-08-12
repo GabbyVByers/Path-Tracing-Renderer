@@ -6,9 +6,9 @@
 
 inline void saveSpheres(World& world, char fileName[24])
 {
-	size_t sizeBytes = sizeof(Sphere) * world.spheres.getSize();
+	size_t sizeBytes = sizeof(Sphere) * world.spheres.size;
 	unsigned char* saveData = new unsigned char[sizeBytes];
-	memcpy(saveData, world.spheres.getHostPtrAtIndex(0), sizeBytes);
+	memcpy(saveData, world.spheres.hostPointer, sizeBytes);
 
 	std::string realFileName(&fileName[0], sizeof(fileName));
 	realFileName = "saves/" + realFileName + ".bin";

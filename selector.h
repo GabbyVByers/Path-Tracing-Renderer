@@ -14,10 +14,10 @@ inline SimpleHitInfo mouseBoxesIntersection(const Ray& ray, const World& world)
     info.hit_t = FLT_MAX;
     info.hit_index = -1;
 
-    for (int i = 0; i < world.boxes.numBoxes; i++)
+    for (int i = 0; i < world.boxes.size; i++)
     {
-        const Vec3& A = world.boxes.hostBoxes[i].boxMin;
-        const Vec3& B = world.boxes.hostBoxes[i].boxMax;
+        const Vec3& A = world.boxes.hostPointer[i].boxMin;
+        const Vec3& B = world.boxes.hostPointer[i].boxMax;
 
         float tmin = -FLT_MAX;
         float tmax = FLT_MAX;
@@ -95,14 +95,14 @@ inline SimpleHitInfo mouseSpheresIntersection(const Ray& ray, World& world)
     info.hit_t = FLT_MAX;
     info.hit_index = -1;
 
-    for (int i = 0; i < world.spheres.getSize(); i++)
+    for (int i = 0; i < world.spheres.size; i++)
     {
-        Sphere* hostSpherePointer = world.spheres.getHostPtrAtIndex(i);
+        Sphere& hostSpherePointer = world.spheres.hostPointer[i];
 
-        Vec3 V = ray.origin - hostSpherePointer->position;
+        Vec3 V = ray.origin - hostSpherePointer.position;
         float a = dot(ray.direction, ray.direction);
         float b = 2.0f * dot(V, ray.direction);
-        float c = dot(V, V) - (hostSpherePointer->radius * hostSpherePointer->radius);
+        float c = dot(V, V) - (hostSpherePointer.radius * hostSpherePointer.radius);
 
         float discriminant = (b * b) - (4.0f * a * c);
         if (discriminant <= 0.0f)
@@ -130,11 +130,11 @@ inline void selectSphere(Opengl& opengl, World& world)
     if (glfwGetMouseButton(opengl.window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS)
         return;
 
-    for (int i = 0; i < world.spheres.getSize(); i++)
-        world.spheres.getHostPtrAtIndex(i)->isSelected = false;
+    for (int i = 0; i < world.spheres.size; i++)
+        world.spheres.hostPointer[i].isSelected = false;
 
-    for (int i = 0; i < world.boxes.numBoxes; i++)
-        world.boxes.hostBoxes[i].isSelected = false;
+    for (int i = 0; i < world.boxes.size; i++)
+        world.boxes.hostPointer[i].isSelected = false;
 
     int screenWidth = opengl.screenWidth;
     int screenHeight = opengl.screenHeight;
@@ -152,15 +152,15 @@ inline void selectSphere(Opengl& opengl, World& world)
     
     if (sphereInfo.hit_t < boxInfo.hit_t)
     {
-        world.spheres.getHostPtrAtIndex(sphereInfo.hit_index)->isSelected = true;
+        world.spheres.hostPointer[sphereInfo.hit_index].isSelected = true;
         world.spheres.updateHostToDevice();
         return;
     }
 
     else if (boxInfo.hit_t < sphereInfo.hit_t)
     {
-        world.boxes.hostBoxes[boxInfo.hit_index].isSelected = true;
-        updateBoxesOnGpu(world.boxes);
+        world.boxes.hostPointer[boxInfo.hit_index].isSelected = true;
+        world.boxes.updateHostToDevice();
     }
 
     return;

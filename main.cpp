@@ -6,19 +6,22 @@
 
 int main()
 {
-    const bool FULLSCREEN = false;
     Opengl opengl;
+    const bool FULLSCREEN = false;
     setupOpengl(opengl, 1920, 1080, "CUDA-Powered Path-Tracing", FULLSCREEN);
     setupImgui(opengl.window);
 
     World world;
     fixCamera(world.camera);
-    buildHashArrayAndFrameBuffer(world.buffer, screenSize(opengl));
-    initializeBoxes(world.boxes);
+    buildHashArrayAndFrameBuffer(world.metadata, screenSize(opengl));
 
     Sphere sphere;
     world.spheres.add(sphere);
     world.spheres.updateHostToDevice();
+
+    Box box;
+    world.boxes.add(box);
+    world.boxes.updateHostToDevice();
 
     FrameRateTracker frameRateTracker;
     char fileName[24] = "";
@@ -34,7 +37,8 @@ int main()
         finishRendering(opengl);
     }
 
-    freeBoxes(world.boxes);
+    world.spheres.free();
+    world.boxes.free();
     freeOpengl(opengl);
     return 0;
 }

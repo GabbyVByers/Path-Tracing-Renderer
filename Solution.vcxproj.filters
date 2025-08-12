@@ -109,16 +109,10 @@
     <CudaCompile Include="gui.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="spheres.h">
-      <Filter>Header Files</Filter>
-    </CudaCompile>
     <CudaCompile Include="saving.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="framerate.h">
-      <Filter>Header Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="boxes.h">
       <Filter>Header Files</Filter>
     </CudaCompile>
     <CudaCompile Include="sharedarray.h">

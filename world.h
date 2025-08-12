@@ -1,14 +1,35 @@
 #pragma once
 
-#include "spheres.h"
-#include "boxes.h"
+#include "vec3.h"
 #include "utilities.h"
 #include "sharedarray.h"
 
+struct Sphere
+{
+    Vec3 position = { -5.0f, 0.0f, 0.0f };
+    float radius = 2.0f;
+    Vec3 color = rgb(100, 255, 150);
+    float roughness = 0.0f;
+    bool isSelected = false;
+    bool isLightSource = false;
+    float lightIntensity = 1.0f;
+};
+
+struct Box
+{
+    Vec3 boxMin = { -2.0f, -2.0f, -2.0f };
+    Vec3 boxMax = { 2.0f, 2.0f, 2.0f };
+    Vec3 color = rgb(255, 100, 255);
+    float roughness = 0.0f;
+    bool isSelected = false;
+    bool isLightSource = false;
+    float lightIntensity = 1.0f;
+};
+
 struct Camera
 {
-    Vec3 position = { 0.0f, 0.0f, -5.0f };
-    Vec3 direction = { 0.0f, 0.0f, 1.0f };
+    Vec3 position = { -8.55f, 3.9f, -8.17f };
+    Vec3 direction = { 0.678f, -0.204f, 0.697f };
     Vec3 up;
     Vec3 right;
     float depth = 1.5f;
@@ -28,8 +49,11 @@ struct Sky
     Vec3 colorGround  = rgb( 79, 112,  76);
 };
 
-struct Buffer
+struct MetaData
 {
+    uchar4* pixels = nullptr;
+    int screenWidth = 0;
+    int screenHeight = 0;
     int numAccumulatedFrames = 0;
     Vec3* accumulatedFrameBuffer;
     unsigned int* deviceHashArray = nullptr;
@@ -37,18 +61,11 @@ struct Buffer
 
 struct World
 {   
-    uchar4* pixels = nullptr;
-    int screenWidth = 0;
-    int screenHeight = 0;
-
+    SharedArray<Sphere> spheres;
+    SharedArray<Box> boxes;
     Camera camera;
     Sky sky;
-    //Spheres spheres;
-    
-    SharedArray<Sphere> spheres;
-    
-    Boxes boxes;
-    Buffer buffer;
+    MetaData metadata;
 };
 
 inline void fixCamera(Camera& camera)
@@ -61,7 +78,7 @@ inline void fixCamera(Camera& camera)
     normalize(camera.up);
 }
 
-inline void buildHashArrayAndFrameBuffer(Buffer& buffer, int screenSize)
+inline void buildHashArrayAndFrameBuffer(MetaData& meta, int screenSize)
 {
     unsigned int* hostHashArray = nullptr;
     hostHashArray = new unsigned int[screenSize];
@@ -71,9 +88,9 @@ inline void buildHashArrayAndFrameBuffer(Buffer& buffer, int screenSize)
         hash_uint32(hash);
         hostHashArray[i] = hash;
     }
-    cudaMalloc((void**)&buffer.deviceHashArray, sizeof(unsigned int) * screenSize);
-    cudaMemcpy(buffer.deviceHashArray, hostHashArray, sizeof(unsigned int) * screenSize, cudaMemcpyHostToDevice);
+    cudaMalloc((void**)&meta.deviceHashArray, sizeof(unsigned int) * screenSize);
+    cudaMemcpy(meta.deviceHashArray, hostHashArray, sizeof(unsigned int) * screenSize, cudaMemcpyHostToDevice);
     delete[] hostHashArray;
-    cudaMalloc((void**)&buffer.accumulatedFrameBuffer, sizeof(Vec3) * screenSize);
+    cudaMalloc((void**)&meta.accumulatedFrameBuffer, sizeof(Vec3) * screenSize);
 }
 

@@ -141,12 +141,12 @@ inline void launchCudaKernel(Opengl& opengl, World& world)
 {
     size_t size;
     cudaGraphicsMapResources(1, &opengl.cudaPBO, 0);
-    cudaGraphicsResourceGetMappedPointer((void**)&world.pixels, &size, opengl.cudaPBO);
+    cudaGraphicsResourceGetMappedPointer((void**)&world.metadata.pixels, &size, opengl.cudaPBO);
 
     dim3 GRID = opengl.grid;
     dim3 BLOCK = opengl.block;
-    world.screenWidth = opengl.screenWidth;
-    world.screenHeight = opengl.screenHeight;
+    world.metadata.screenWidth = opengl.screenWidth;
+    world.metadata.screenHeight = opengl.screenHeight;
     mainKernel <<<GRID, BLOCK>>> (world);
 }
 

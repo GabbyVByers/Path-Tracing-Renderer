@@ -16,37 +16,37 @@ inline void processKeyboardInput(Opengl& opengl, World& world)
     if (glfwGetKey(opengl.window, GLFW_KEY_W) == GLFW_PRESS)
     {
         world.camera.position += forward * slow;
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_S) == GLFW_PRESS)
     {
         world.camera.position -= forward * slow;
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_D) == GLFW_PRESS)
     {
         world.camera.position += right * slow;
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_A) == GLFW_PRESS)
     {
         world.camera.position -= right * slow;
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
         world.camera.position += up * slow;
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 
     if (glfwGetKey(opengl.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
         world.camera.position -= up * slow;
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 }
 
@@ -64,7 +64,7 @@ inline void processMouseInput(Opengl& opengl, World& world)
     ImGuiIO& io = ImGui::GetIO();
     if (io.WantCaptureMouse)
     {
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
         return;
     }
 
@@ -75,20 +75,20 @@ inline void processMouseInput(Opengl& opengl, World& world)
     {
         world.camera.direction = rotate(world.camera.direction, up, 0.005f * -mouseRelX);
         fixCamera(world.camera);
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 
     if (mouseRelY != 0.0f)
     {
         world.camera.direction = rotate(world.camera.direction, world.camera.right, 0.005f * -mouseRelY);
         fixCamera(world.camera);
-        world.buffer.numAccumulatedFrames = 0;
+        world.metadata.numAccumulatedFrames = 0;
     }
 }
 
 inline void processKeyboardMouseInput(Opengl& opengl, World& world)
 {
-    world.buffer.numAccumulatedFrames++;
+    world.metadata.numAccumulatedFrames++;
     processKeyboardInput(opengl, world);
     processMouseInput(opengl, world);
 }

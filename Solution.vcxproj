@@ -98,10 +98,8 @@
   <ItemGroup>
     <CudaCompile Include="saving.h" />
     <CudaCompile Include="framerate.h" />
-    <CudaCompile Include="boxes.h" />
     <CudaCompile Include="sharedarray.h" />
     <ClInclude Include="selector.h" />
-    <CudaCompile Include="spheres.h" />
     <CudaCompile Include="input.h" />
     <CudaCompile Include="thread.h" />
     <CudaCompile Include="world.h" />

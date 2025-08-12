@@ -3,8 +3,8 @@
 #include "cuda_runtime.h"
 #include "iostream"
 
-#define HOST = 0;
-#define DEVICE = 1;
+#define HOST 0
+#define DEVICE 1
 
 /*
 	A utility for managing an array of elements between the Host and Device
@@ -13,10 +13,6 @@
 	Accessing an element with operator "example_array[index]" returns a pointer to that element.
 	Call the appropriate update function if you modify the element with the pointer returned by accessing.
 */
-
-// I am looking through the callstack,
-// and i think the deconstructor is being called when world is passed to mainKernel
-// should try converting this from a class to a struct but it's 1 am would rather go to bed.
 
 template<typename type>
 
@@ -88,8 +84,8 @@ public:
 		delete[] hostPointer;
 		cudaFree(devicePointer);
 
-		size_t size = 0;
-		size_t capacity = 1;
+		size = 0;
+		capacity = 1;
 
 		hostPointer = new type[capacity];
 		cudaMalloc((void**)&devicePointer, sizeof(type) * capacity);
@@ -105,21 +101,10 @@ public:
 		cudaMemcpy(hostPointer, devicePointer, size * sizeof(type), cudaMemcpyDeviceToHost);
 	}
 
-	__host__ __device__ type operator[](size_t index, int TARGET)
+	void free()
 	{
-		if (TARGET == HOST)
-		{
-			return hostPointer[index];
-		}
-		if (TARGET == DEVICE)
-		{
-			return devicePointer[index];
-		}
-	}
-
-	__host__ __device__ size_t getSize() const
-	{
-		return size;
+		delete[] hostPointer;
+		cudaFree(devicePointer);
 	}
 };
 
