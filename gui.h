@@ -117,7 +117,9 @@ inline void drawImgui(World& world, char fileName[24], int fps)
         if (ImGui::Button("Duplicate"))
         {
             Sphere newSphere = world.spheres.hostPointer[indexSphere];
-            newSphere.position.y += newSphere.radius * 2.0f;
+            newSphere.position.y += newSphere.radius * 2.4f;
+            newSphere.isSelected = true;
+            world.spheres.hostPointer[indexSphere].isSelected = false;
             world.spheres.add(newSphere);
         }
 
@@ -155,6 +157,8 @@ inline void drawImgui(World& world, char fileName[24], int fps)
             Vec3 offset = (newBox.boxMax - newBox.boxMin) * 1.2f;
             newBox.boxMax += offset;
             newBox.boxMin += offset;
+            newBox.isSelected = true;
+            world.boxes.hostPointer[indexBox].isSelected = false;
             world.boxes.add(newBox);
         }
 
