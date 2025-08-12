@@ -122,6 +122,7 @@ inline void setupOpengl(Opengl& opengl, int screenWidth, int screenHeight, std::
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
+    glfwSwapInterval(1);
     return;
 }
 

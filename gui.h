@@ -48,17 +48,17 @@ inline void drawImgui(World& world, char fileName[24], int fps)
 
     ImGui::NewFrame();
     
-    ImGui::Begin("DEBUGGER");
+    ImGui::Begin("Main Menu");
+
+    ImGui::Text(" ");
+    ImGui::Text("Frames Per Second: %d", fps);
+    ImGui::Text("Accumulated Frames: %d", world.metadata.numAccumulatedFrames);
 
     ImGui::Text(" ");
     ImGui::Text("Camera Properties");
     ImGui::DragFloat3("Position", (float*)&world.camera.position, 0.05f);
     ImGui::DragFloat3("Direction", (float*)&world.camera.direction, 0.05f);
     fixCamera(world.camera);
-
-    ImGui::Text(" ");
-    ImGui::Text("Frames Per Second: %d", fps);
-    ImGui::Text("Accumulated Frames: %d", world.metadata.numAccumulatedFrames);
 
     ImGui::Text(" ");
     if (ImGui::Button("Toggle Enviroment Lighting"))
@@ -76,7 +76,7 @@ inline void drawImgui(World& world, char fileName[24], int fps)
     normalize(world.sky.sunDirection);
 
     ImGui::Text(" ");
-    ImGui::Text("SKY PARAMETERS");
+    ImGui::Text("Sky Parameters");
     ImGui::SliderFloat("Sun Int", &world.sky.sunIntensity, 0.0f, 100.0f);
     ImGui::SliderFloat("Sun Exp", &world.sky.sunExponent, 1.0f, 150.0f);
     ImGui::SliderFloat("Hor Exp", &world.sky.horizonExponent, 0.0f, 1.0f);
@@ -152,9 +152,9 @@ inline void drawImgui(World& world, char fileName[24], int fps)
         if (ImGui::Button("Duplicate"))
         {
             Box newBox = world.boxes.hostPointer[indexBox];
-            float offset = (newBox.boxMax.y - newBox.boxMin.y) * 1.2f;
-            newBox.boxMax.y += offset;
-            newBox.boxMin.y += offset;
+            Vec3 offset = (newBox.boxMax - newBox.boxMin) * 1.2f;
+            newBox.boxMax += offset;
+            newBox.boxMin += offset;
             world.boxes.add(newBox);
         }
 
