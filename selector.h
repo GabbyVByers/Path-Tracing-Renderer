@@ -4,76 +4,39 @@
 
 struct SimpleHitInfo
 {
-    float hit_t;
-    int hit_index;
+    float hit_t = FLT_MAX;
+    int hit_index = -1;
 };
 
 inline SimpleHitInfo mouseBoxesIntersection(const Ray& ray, const World& world)
 {
     SimpleHitInfo info;
-    info.hit_t = FLT_MAX;
-    info.hit_index = -1;
 
     for (int i = 0; i < world.boxes.size; i++)
     {
-        const Vec3& A = world.boxes.hostPointer[i].boxMin;
-        const Vec3& B = world.boxes.hostPointer[i].boxMax;
+        Box& box = world.boxes.hostPointer[i];
+        Vec3& position = box.position;
+        Vec3& size = box.size;
 
-        float tmin = -FLT_MAX;
-        float tmax = FLT_MAX;
+        Vec3 min = position - size;
+        Vec3 max = position + size;
 
-        if (ray.direction.x != 0.0f)
-        {
-            float invD = 1.0f / ray.direction.x;
-            float t0 = (A.x - ray.origin.x) * invD;
-            float t1 = (B.x - ray.origin.x) * invD;
-            if (invD < 0.0f)
-            {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-            tmin = fmaxf(tmin, t0);
-            tmax = fminf(tmax, t1);
-        }
-        else if (ray.origin.x < A.x || ray.origin.x > B.x)
-            return info;
+        float tminx = (min.x - ray.origin.x) / ray.direction.x;
+        float tmaxx = (max.x - ray.origin.x) / ray.direction.x;
+        if (tminx > tmaxx) { float temp = tminx; tminx = tmaxx; tmaxx = temp; }
 
-        if (ray.direction.y != 0.0f)
-        {
-            float invD = 1.0f / ray.direction.y;
-            float t0 = (A.y - ray.origin.y) * invD;
-            float t1 = (B.y - ray.origin.y) * invD;
-            if (invD < 0.0f)
-            {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-            tmin = fmaxf(tmin, t0);
-            tmax = fminf(tmax, t1);
-        }
-        else if (ray.origin.y < A.y || ray.origin.y > B.y)
-            return info;
+        float tminy = (min.y - ray.origin.y) / ray.direction.y;
+        float tmaxy = (max.y - ray.origin.y) / ray.direction.y;
+        if (tminy > tmaxy) { float temp = tminy; tminy = tmaxy; tmaxy = temp; }
 
-        if (ray.direction.z != 0.0f)
-        {
-            float invD = 1.0f / ray.direction.z;
-            float t0 = (A.z - ray.origin.z) * invD;
-            float t1 = (B.z - ray.origin.z) * invD;
-            if (invD < 0.0f)
-            {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-            tmin = fmaxf(tmin, t0);
-            tmax = fminf(tmax, t1);
-        }
-        else if (ray.origin.z < A.z || ray.origin.z > B.z)
-            return info;
+        float tminz = (min.z - ray.origin.z) / ray.direction.z;
+        float tmaxz = (max.z - ray.origin.z) / ray.direction.z;
+        if (tminz > tmaxz) { float temp = tminz; tminz = tmaxz; tmaxz = temp; }
 
-        if (tmax < tmin)
+        float tmin = fmaxf(fmaxf(tminx, tminy), tminz);
+        float tmax = fminf(fminf(tmaxx, tmaxy), tmaxz);
+
+        if (tmin > tmax)
             continue;
 
         if (tmin < 0.0f)
@@ -92,8 +55,6 @@ inline SimpleHitInfo mouseBoxesIntersection(const Ray& ray, const World& world)
 inline SimpleHitInfo mouseSpheresIntersection(const Ray& ray, World& world)
 {
     SimpleHitInfo info;
-    info.hit_t = FLT_MAX;
-    info.hit_index = -1;
 
     for (int i = 0; i < world.spheres.size; i++)
     {

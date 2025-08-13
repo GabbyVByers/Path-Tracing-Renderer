@@ -63,7 +63,7 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
     ImGui::Text(" ");
     ImGui::Text("Camera Properties");
     ImGui::DragFloat3("Position", (float*)&world.camera.position, 0.05f);
-    ImGui::DragFloat3("Direction", (float*)&world.camera.direction, 0.05f);
+    ImGui::DragFloat3("Direction", (float*)&world.camera.direction, 0.005f);
     fixCamera(world.camera);
 
     ImGui::Text(" ");
@@ -144,8 +144,8 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
             world.boxes.hostPointer[indexBox].isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::DragFloat3("Position Max", (float*)&world.boxes.hostPointer[indexBox].boxMax, 0.05f);
-        ImGui::DragFloat3("Position Min", (float*)&world.boxes.hostPointer[indexBox].boxMin, 0.05f);
+        ImGui::DragFloat3("Position", (float*)&world.boxes.hostPointer[indexBox].position, 0.05f);
+        ImGui::DragFloat3("Size", (float*)&world.boxes.hostPointer[indexBox].size, 0.05f);
 
         ImGui::Text(" ");
         ImGui::SliderFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.0f, 1.0f);
@@ -163,9 +163,7 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
         if (ImGui::Button("Duplicate"))
         {
             Box newBox = world.boxes.hostPointer[indexBox];
-            Vec3 offset = (newBox.boxMax - newBox.boxMin) * 1.2f;
-            newBox.boxMax += offset;
-            newBox.boxMin += offset;
+            newBox.position.y += newBox.size.y * 2.0f;
             newBox.isSelected = true;
             world.boxes.hostPointer[indexBox].isSelected = false;
             world.boxes.add(newBox);

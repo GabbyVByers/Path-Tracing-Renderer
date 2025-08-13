@@ -17,8 +17,8 @@ struct Sphere
 
 struct Box
 {
-    Vec3 boxMin = { -2.0f, -2.0f, -2.0f };
-    Vec3 boxMax = { 2.0f, 2.0f, 2.0f };
+    Vec3 position = { 0.0f, 0.0f, 0.0f };
+    Vec3 size = { 1.0f, 1.0f, 1.0f };
     Vec3 color = rgb(255, 100, 255);
     float roughness = 0.0f;
     bool isSelected = false;

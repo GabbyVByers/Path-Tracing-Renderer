@@ -22,98 +22,71 @@ struct Ray
     Vec3 direction;
 };
 
-__device__ inline Vec3 getBoxNormal(Vec3 hitLocation, Vec3 A, Vec3 B)
-{
-    const float epsilon = 0.0001f;
-
-    if (fabs(hitLocation.x - A.x) < epsilon) return { -1.0f, 0.0f, 0.0f };
-    if (fabs(hitLocation.x - B.x) < epsilon) return {  1.0f, 0.0f, 0.0f };
-
-    if (fabs(hitLocation.y - A.y) < epsilon) return { 0.0f, -1.0f, 0.0f };
-    if (fabs(hitLocation.y - B.y) < epsilon) return { 0.0f,  1.0f, 0.0f };
-
-    if (fabs(hitLocation.z - A.z) < epsilon) return { 0.0f, 0.0f, -1.0f };
-    if (fabs(hitLocation.z - B.z) < epsilon) return { 0.0f, 0.0f,  1.0f };
-
-    return { 0.0f, 0.0f, 0.0f };
-}
-
 __device__ inline HitInfo rayBoxesIntersection(const Ray& ray, const World& world)
 {
     HitInfo info;
 
     for (int i = 0; i < world.boxes.size; i++)
     {
-        const Vec3& A = world.boxes.devicePointer[i].boxMin;
-        const Vec3& B = world.boxes.devicePointer[i].boxMax;
-        
-        float tmin = -FLT_MAX;
-        float tmax = FLT_MAX;
+        Box& box = world.boxes.devicePointer[i];
+        Vec3& position = box.position;
+        Vec3& size = box.size;
 
-        if (ray.direction.x != 0.0f)
-        {
-            float invD = 1.0f / ray.direction.x;
-            float t0 = (A.x - ray.origin.x) * invD;
-            float t1 = (B.x - ray.origin.x) * invD;
-            if (invD < 0.0f)
-            {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-            tmin = fmaxf(tmin, t0);
-            tmax = fminf(tmax, t1);
-        }
-        else if (ray.origin.x < A.x || ray.origin.x > B.x)
-            return info;
+        Vec3 min = position - size;
+        Vec3 max = position + size;
 
-        if (ray.direction.y != 0.0f)
-        {
-            float invD = 1.0f / ray.direction.y;
-            float t0 = (A.y - ray.origin.y) * invD;
-            float t1 = (B.y - ray.origin.y) * invD;
-            if (invD < 0.0f)
-            {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-            tmin = fmaxf(tmin, t0);
-            tmax = fminf(tmax, t1);
-        }
-        else if (ray.origin.y < A.y || ray.origin.y > B.y)
-            return info;
+        float normalSignX = -1.0f;
+        float normalSignY = -1.0f;
+        float normalSignZ = -1.0f;
 
-        if (ray.direction.z != 0.0f)
-        {
-            float invD = 1.0f / ray.direction.z;
-            float t0 = (A.z - ray.origin.z) * invD;
-            float t1 = (B.z - ray.origin.z) * invD;
-            if (invD < 0.0f)
-            {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
-            }
-            tmin = fmaxf(tmin, t0);
-            tmax = fminf(tmax, t1);
-        }
-        else if (ray.origin.z < A.z || ray.origin.z > B.z)
-            return info;
+        float tminx = (min.x - ray.origin.x) / ray.direction.x;
+        float tmaxx = (max.x - ray.origin.x) / ray.direction.x;
+        if (tminx > tmaxx) { float temp = tminx; tminx = tmaxx; tmaxx = temp; normalSignX = 1.0f; }
 
-        if (tmax < tmin)
+        float tminy = (min.y - ray.origin.y) / ray.direction.y;
+        float tmaxy = (max.y - ray.origin.y) / ray.direction.y;
+        if (tminy > tmaxy) { float temp = tminy; tminy = tmaxy; tmaxy = temp; normalSignY = 1.0f; }
+
+        float tminz = (min.z - ray.origin.z) / ray.direction.z;
+        float tmaxz = (max.z - ray.origin.z) / ray.direction.z;
+        if (tminz > tmaxz) { float temp = tminz; tminz = tmaxz; tmaxz = temp; normalSignZ = 1.0f; }
+
+        float tmin = fmaxf(fmaxf(tminx, tminy), tminz);
+        float tmax = fminf(fminf(tmaxx, tmaxy), tmaxz);
+
+        if (tmin > tmax)
             continue;
 
         if (tmin < 0.0f)
             continue;
 
+        Vec3 normal;
+
+        if (tmin == tminx)
+        {
+            normal = { 1.0f, 0.0f, 0.0f };
+            normal *= normalSignX;
+        }
+
+        if (tmin == tminy)
+        {
+            normal = { 0.0f, 1.0f, 0.0f };
+            normal *= normalSignY;
+        }
+
+        if (tmin == tminz)
+        {
+            normal = { 0.0f, 0.0f, 1.0f };
+            normal *= normalSignZ;
+        }
+        
         if (tmin < info.closest_t)
         {
             info.didHit = true;
             info.closest_t = tmin;
             info.hitLocation = ray.origin + (ray.direction * tmin);
             info.hitColor = world.boxes.devicePointer[i].color;
-            info.hitNormal = getBoxNormal(info.hitLocation, A, B);
+            info.hitNormal = normal;
             info.hitRoughness = world.boxes.devicePointer[i].roughness;
             info.hitIsLightSource = world.boxes.devicePointer[i].isLightSource;
             info.hitLightIntensity = world.boxes.devicePointer[i].lightIntensity;
@@ -201,7 +174,7 @@ __device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, World& wo
     
         color = color * info.hitColor;
     
-        ray.origin = info.hitLocation;
+        ray.origin = info.hitLocation + (info.hitNormal * 0.0001f);
     
         Vec3 diffuseDirection = randomHemisphereDirection(info.hitNormal, *thread.hashPtr) + randomDirection(*thread.hashPtr);
         Vec3 specularDirection = reflect(ray.direction, info.hitNormal);
