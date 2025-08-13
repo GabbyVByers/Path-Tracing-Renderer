@@ -141,8 +141,8 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
             world.boxes.hostPointer[indexBox].isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::DragFloat3("Position Min", (float*)&world.boxes.hostPointer[indexBox].boxMin, 0.05f);
         ImGui::DragFloat3("Position Max", (float*)&world.boxes.hostPointer[indexBox].boxMax, 0.05f);
+        ImGui::DragFloat3("Position Min", (float*)&world.boxes.hostPointer[indexBox].boxMin, 0.05f);
 
         ImGui::Text(" ");
         ImGui::SliderFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.0f, 1.0f);
