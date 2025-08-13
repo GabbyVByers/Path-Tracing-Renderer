@@ -23,17 +23,17 @@ int main()
     world.boxes.add(box);
     world.boxes.updateHostToDevice();
 
-    FrameRateTracker frameRateTracker;
+    FrameRateTracker FPSTracker;
     char fileName[24] = "";
 
     while (!glfwWindowShouldClose(opengl.window))
     {
-        frameRateTracker.update();
+        FPSTracker.update();
         selectSphere(opengl, world);
         launchCudaKernel(opengl, world);
         processKeyboardMouseInput(opengl, world);
         renderScreen(opengl);
-        drawImgui(opengl.enableGUI, world, fileName, frameRateTracker.frameRate);
+        drawImgui(opengl.enableGUI, world, fileName, FPSTracker.getFPS());
         finishRendering(opengl);
     }
 

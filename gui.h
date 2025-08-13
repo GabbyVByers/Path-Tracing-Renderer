@@ -50,9 +50,9 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
     ImGui_ImplGlfw_NewFrame();
 
     ImGui::NewFrame();
-    
     ImGui::Begin("Main Menu");
 
+    ImGui::Text("Press P to Reopen GUI");
     if (ImGui::Button("Disable GUI"))
         enableGUI = false;
 
@@ -78,7 +78,10 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
         glfwSwapInterval(0);
 
     ImGui::Text(" ");
-    ImGui::DragFloat3("Sun Direction", (float*)&world.sky.sunDirection, 0.05f);
+    ImGui::SliderInt("Bounce Limit", &world.global.maxBounceLimit, 0, 64);
+
+    ImGui::Text(" ");
+    ImGui::DragFloat3("Sun Direction", (float*)&world.sky.sunDirection, 0.005f);
     normalize(world.sky.sunDirection);
 
     ImGui::Text(" ");
