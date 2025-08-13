@@ -21,8 +21,11 @@ inline void setupImgui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-inline void drawImgui(World& world, char fileName[24], int fps)
+inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
 {
+    if (!enableGUI)
+        return;
+
     int indexSphere = -1;
     for (int i = 0; i < world.spheres.size; i++)
     {
@@ -50,9 +53,12 @@ inline void drawImgui(World& world, char fileName[24], int fps)
     
     ImGui::Begin("Main Menu");
 
+    if (ImGui::Button("Disable GUI"))
+        enableGUI = false;
+
     ImGui::Text(" ");
     ImGui::Text("Frames Per Second: %d", fps);
-    ImGui::Text("Accumulated Frames: %d", world.metadata.numAccumulatedFrames);
+    ImGui::Text("Accumulated Frames: %d", world.global.numAccumulatedFrames);
 
     ImGui::Text(" ");
     ImGui::Text("Camera Properties");

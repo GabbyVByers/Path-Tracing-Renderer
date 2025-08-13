@@ -26,6 +26,7 @@ struct Opengl
     dim3 grid = 0;
     double prevMouseX = 0.0f;
     double prevMouseY = 0.0f;
+    bool enableGUI = true;
 };
 
 inline void setupOpengl(Opengl& opengl, int screenWidth, int screenHeight, std::string title, bool fullScreen)
@@ -142,12 +143,12 @@ inline void launchCudaKernel(Opengl& opengl, World& world)
 {
     size_t size;
     cudaGraphicsMapResources(1, &opengl.cudaPBO, 0);
-    cudaGraphicsResourceGetMappedPointer((void**)&world.metadata.pixels, &size, opengl.cudaPBO);
+    cudaGraphicsResourceGetMappedPointer((void**)&world.global.pixels, &size, opengl.cudaPBO);
 
     dim3 GRID = opengl.grid;
     dim3 BLOCK = opengl.block;
-    world.metadata.screenWidth = opengl.screenWidth;
-    world.metadata.screenHeight = opengl.screenHeight;
+    world.global.screenWidth = opengl.screenWidth;
+    world.global.screenHeight = opengl.screenHeight;
     mainKernel <<<GRID, BLOCK>>> (world);
 }
 

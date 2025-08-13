@@ -49,7 +49,7 @@ struct Sky
     Vec3 colorGround  = rgb( 79, 112,  76);
 };
 
-struct MetaData
+struct GlobalUtilities
 {
     uchar4* pixels = nullptr;
     int screenWidth = 0;
@@ -57,6 +57,8 @@ struct MetaData
     int numAccumulatedFrames = 0;
     Vec3* accumulatedFrameBuffer;
     unsigned int* deviceHashArray = nullptr;
+    float antiAliasing = 0.001f;
+    int maxBounceLimit = 50;
 };
 
 struct World
@@ -65,7 +67,7 @@ struct World
     SharedArray<Box> boxes;
     Camera camera;
     Sky sky;
-    MetaData metadata;
+    GlobalUtilities global;
 };
 
 inline void fixCamera(Camera& camera)
@@ -78,7 +80,7 @@ inline void fixCamera(Camera& camera)
     normalize(camera.up);
 }
 
-inline void buildHashArrayAndFrameBuffer(MetaData& meta, int screenSize)
+inline void buildHashArrayAndFrameBuffer(GlobalUtilities& global, int screenSize)
 {
     unsigned int* hostHashArray = nullptr;
     hostHashArray = new unsigned int[screenSize];
@@ -88,9 +90,9 @@ inline void buildHashArrayAndFrameBuffer(MetaData& meta, int screenSize)
         hash_uint32(hash);
         hostHashArray[i] = hash;
     }
-    cudaMalloc((void**)&meta.deviceHashArray, sizeof(unsigned int) * screenSize);
-    cudaMemcpy(meta.deviceHashArray, hostHashArray, sizeof(unsigned int) * screenSize, cudaMemcpyHostToDevice);
+    cudaMalloc((void**)&global.deviceHashArray, sizeof(unsigned int) * screenSize);
+    cudaMemcpy(global.deviceHashArray, hostHashArray, sizeof(unsigned int) * screenSize, cudaMemcpyHostToDevice);
     delete[] hostHashArray;
-    cudaMalloc((void**)&meta.accumulatedFrameBuffer, sizeof(Vec3) * screenSize);
+    cudaMalloc((void**)&global.accumulatedFrameBuffer, sizeof(Vec3) * screenSize);
 }
 

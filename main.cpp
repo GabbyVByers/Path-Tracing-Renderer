@@ -7,13 +7,13 @@
 int main()
 {
     Opengl opengl;
-    const bool FULLSCREEN = false;
+    const bool FULLSCREEN = true;
     setupOpengl(opengl, 1920, 1080, "CUDA-Powered Path-Tracing", FULLSCREEN);
     setupImgui(opengl.window);
 
     World world;
     fixCamera(world.camera);
-    buildHashArrayAndFrameBuffer(world.metadata, screenSize(opengl));
+    buildHashArrayAndFrameBuffer(world.global, screenSize(opengl));
 
     Sphere sphere;
     world.spheres.add(sphere);
@@ -33,7 +33,7 @@ int main()
         launchCudaKernel(opengl, world);
         processKeyboardMouseInput(opengl, world);
         renderScreen(opengl);
-        drawImgui(world, fileName, frameRateTracker.frameRate);
+        drawImgui(opengl.enableGUI, world, fileName, frameRateTracker.frameRate);
         finishRendering(opengl);
     }
 

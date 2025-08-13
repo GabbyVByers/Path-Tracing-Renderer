@@ -179,11 +179,10 @@ __device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, World& wo
     color = 1.0f;
     light = 0.0f;
 
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < world.global.maxBounceLimit; i++)
     {
         HitInfo info = raySpheresIntersection(ray, world);
         HitInfo boxInfo = rayBoxesIntersection(ray, world);
-
         if (boxInfo.closest_t < info.closest_t)
             info = boxInfo;
     
@@ -216,30 +215,30 @@ __device__ inline Vec3 calculateIncomingLight(Ray ray, Thread& thread, World& wo
 
 __device__ inline void frameAccumulation(Vec3 newColor, const Thread& thread, World& world)
 {
-    Vec3& accumulatedColor = world.metadata.accumulatedFrameBuffer[thread.index];
+    Vec3& accumulatedColor = world.global.accumulatedFrameBuffer[thread.index];
     
-    if (world.metadata.numAccumulatedFrames == 0)
+    if (world.global.numAccumulatedFrames == 0)
         accumulatedColor = 0.0f;
 
     accumulatedColor += newColor;
-    Vec3 thisColor = accumulatedColor / (world.metadata.numAccumulatedFrames + 1);
+    Vec3 thisColor = accumulatedColor / (world.global.numAccumulatedFrames + 1);
 
     unsigned char r = fminf(255.0f, thisColor.x * 255.0f);
     unsigned char g = fminf(255.0f, thisColor.y * 255.0f);
     unsigned char b = fminf(255.0f, thisColor.z * 255.0f);
-    world.metadata.pixels[thread.index] = make_uchar4(r, g, b, 255);
+    world.global.pixels[thread.index] = make_uchar4(r, g, b, 255);
 }
 
 __global__ inline void mainKernel(World world)
 {
-    Thread thread = getThread(world.metadata.screenWidth, world.metadata.screenHeight, world.metadata.deviceHashArray);
+    Thread thread = getThread(world.global.screenWidth, world.global.screenHeight, world.global.deviceHashArray);
     if (thread.index == -1)
         return;
 
     Ray ray;
     ray.origin = world.camera.position;
     ray.direction = (world.camera.direction * world.camera.depth) + (world.camera.right * thread.u) + (world.camera.up * thread.v);
-    ray.direction += randomDirection(*thread.hashPtr) * 0.001f;
+    ray.direction += randomDirection(*thread.hashPtr) * world.global.antiAliasing;
     normalize(ray.direction);
 
     Vec3 color = calculateIncomingLight(ray, thread, world);

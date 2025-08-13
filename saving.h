@@ -4,11 +4,31 @@
 #include <fstream>
 #include <string>
 
+struct MetaData
+{
+	int sizeBytes = -1;
+	int numSpheres = -1;
+	int numBoxes = -1;
+};
+
 inline void saveSpheres(World& world, char fileName[24])
 {
-	size_t sizeBytes = sizeof(Sphere) * world.spheres.size;
-	unsigned char* saveData = new unsigned char[sizeBytes];
-	memcpy(saveData, world.spheres.hostPointer, sizeBytes);
+	int numSpheres = world.spheres.size;
+	int numBoxes = world.boxes.size;
+	int sizeBytes = sizeof(MetaData) + (numSpheres * sizeof(Sphere)) + (numBoxes * sizeof(Box));
+
+	MetaData meta;
+	meta.sizeBytes = sizeBytes;
+	meta.numSpheres = numSpheres;
+	meta.numBoxes = numBoxes;
+
+	char* buffer = new char[sizeBytes];
+	Sphere* spheres = world.spheres.hostPointer;
+	Box* boxes = world.boxes.hostPointer;
+
+	memcpy(buffer, &meta, sizeof(MetaData));
+	memcpy(buffer + sizeof(MetaData), spheres, numSpheres * sizeof(Sphere));
+	memcpy(buffer + sizeof(MetaData) + (numSpheres * sizeof(Sphere)), boxes, numBoxes * sizeof(Box));
 
 	std::string realFileName(&fileName[0], sizeof(fileName));
 	realFileName = "saves/" + realFileName + ".bin";
@@ -16,48 +36,45 @@ inline void saveSpheres(World& world, char fileName[24])
 	std::ofstream outFile(realFileName, std::ios::binary);
 	if (outFile.is_open())
 	{
-		outFile.write(reinterpret_cast<const char*>(saveData), sizeBytes);
+		outFile.write(reinterpret_cast<const char*>(buffer), sizeBytes);
 		outFile.close();
 	}
 
-	delete[] saveData;
+	delete[] buffer;
 }
 
 inline void loadSpheres(World& world, char fileName[24])
 {
 	std::string realFileName(fileName, sizeof(fileName));
 	realFileName = "saves/" + realFileName + ".bin";
-	std::ifstream inFile(realFileName, std::ios::binary);
 
+	std::ifstream inFile(realFileName, std::ios::binary);
 	if (!inFile.is_open())
 		return;
 
-	inFile.seekg(0, std::ios::end);
-	size_t sizeBytes = inFile.tellg();
+	MetaData meta;
+	inFile.read((char*)&meta, sizeof(MetaData));
+
+	char* buffer = new char[meta.sizeBytes];
 	inFile.seekg(0, std::ios::beg);
-
-	char* saveData = new char[sizeBytes];
-	inFile.read(saveData, sizeBytes);
-
-	int numSpheres = sizeBytes / sizeof(Sphere);
+	inFile.read(buffer, meta.sizeBytes);
 
 	world.spheres.clear();
+	world.boxes.clear();
 
-	for (int i = 0; i < numSpheres; i++)
+	for (int i = 0; i < meta.numSpheres; i++)
 	{
-		Sphere sphere = ((Sphere*)saveData)[i];
+		Sphere sphere = ((Sphere*)(buffer + sizeof(MetaData)))[i];
 		world.spheres.add(sphere);
 	}
 
-	world.spheres.updateHostToDevice();
+	for (int i = 0; i < meta.numBoxes; i++)
+	{
+		Box box = ((Box*)(buffer + sizeof(MetaData) + (meta.numSpheres * sizeof(Sphere))))[i];
+		world.boxes.add(box);
+	}
 
-	//freeSpheres(world.spheres);
-	//
-	//world.spheres.numSpheres = numSpheres;
-	//world.spheres.hostSpheres = new Sphere[numSpheres];
-	//cudaMalloc((void**)&world.spheres.deviceSpheres, sizeof(Sphere) * numSpheres);
-	//
-	//memcpy(world.spheres.hostSpheres, saveData, sizeBytes);
-	//updateSpheresOnGpu(world.spheres);
+	world.spheres.updateHostToDevice();
+	world.boxes.updateHostToDevice();
 }
 
