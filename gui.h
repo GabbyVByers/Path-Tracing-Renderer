@@ -21,10 +21,14 @@ inline void setupImgui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init("#version 330");
 }
 
-inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
+inline void drawImgui(bool& enableGUI, GLFWwindow* window, World& world, char fileName[24], int fps)
 {
     if (!enableGUI)
+    {
+        glfwSwapBuffers(window);
+        glfwPollEvents();
         return;
+    }
 
     int indexSphere = -1;
     for (int i = 0; i < world.spheres.size; i++)
@@ -107,8 +111,8 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
             world.spheres.hostPointer[indexSphere].isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::DragFloat("Radius", &world.spheres.hostPointer[indexSphere].radius, 0.05f);
         ImGui::DragFloat3("Position", (float*)&world.spheres.hostPointer[indexSphere].position, 0.05f);
+        ImGui::DragFloat("Radius", &world.spheres.hostPointer[indexSphere].radius, 0.05f);
         
         ImGui::Text(" ");
         ImGui::DragFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.0005f, 0.0f, 1.0f);
@@ -173,9 +177,16 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
         ImGui::End();
     }
 
+    ImGui::Begin("Exit Menu");
+    if (ImGui::Button("Exit Application"))
+        glfwSetWindowShouldClose(window, true);
+    ImGui::End();
+
     ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    glfwSwapBuffers(window);
+    glfwPollEvents();
 }
 

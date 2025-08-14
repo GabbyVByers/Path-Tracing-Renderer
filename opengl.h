@@ -166,14 +166,6 @@ inline void renderScreen(Opengl& opengl)
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-inline void finishRendering(Opengl& opengl)
-{
-    glfwSwapBuffers(opengl.window);
-    glfwPollEvents();
-    if (glfwGetKey(opengl.window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(opengl.window, true);
-}
-
 inline int screenSize(const Opengl& opengl)
 {
     return opengl.screenWidth * opengl.screenHeight;

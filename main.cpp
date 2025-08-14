@@ -33,8 +33,7 @@ int main()
         launchCudaKernel(opengl, world);
         processKeyboardMouseInput(opengl, world);
         renderScreen(opengl);
-        drawImgui(opengl.enableGUI, world, fileName, FPSTracker.getFPS());
-        finishRendering(opengl);
+        drawImgui(opengl.enableGUI, opengl.window, world, fileName, FPSTracker.getFPS());
     }
 
     world.spheres.free();
