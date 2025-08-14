@@ -27,6 +27,7 @@ inline void drawImgui(bool& enableGUI, GLFWwindow* window, World& world, char fi
     {
         glfwSwapBuffers(window);
         glfwPollEvents();
+        std::cout << "Accumulated Frames: " << world.global.numAccumulatedFrames << "\n";
         return;
     }
 
@@ -56,19 +57,13 @@ inline void drawImgui(bool& enableGUI, GLFWwindow* window, World& world, char fi
     ImGui::NewFrame();
     ImGui::Begin("Main Menu");
 
-    ImGui::Text("Press P to Reopen GUI");
     if (ImGui::Button("Disable GUI"))
         enableGUI = false;
+    ImGui::Text("Press P to Reopen GUI");
 
     ImGui::Text(" ");
     ImGui::Text("Frames Per Second: %d", fps);
     ImGui::Text("Accumulated Frames: %d", world.global.numAccumulatedFrames);
-
-    ImGui::Text(" ");
-    ImGui::Text("Camera Properties");
-    ImGui::DragFloat3("Position", (float*)&world.camera.position, 0.05f);
-    ImGui::DragFloat3("Direction", (float*)&world.camera.direction, 0.005f);
-    fixCamera(world.camera);
 
     ImGui::Text(" ");
     if (ImGui::Button("Toggle Enviroment Lighting"))
@@ -82,14 +77,18 @@ inline void drawImgui(bool& enableGUI, GLFWwindow* window, World& world, char fi
         glfwSwapInterval(0);
 
     ImGui::Text(" ");
-    ImGui::SliderInt("Bounce Limit", &world.global.maxBounceLimit, 0, 64);
+    ImGui::SliderInt("Bounce Limit", &world.global.maxBounceLimit, 0, 32);
 
     ImGui::Text(" ");
-    ImGui::DragFloat3("Sun Direction", (float*)&world.sky.sunDirection, 0.005f);
-    normalize(world.sky.sunDirection);
+    ImGui::Text("Camera Properties");
+    ImGui::DragFloat3("Position", (float*)&world.camera.position, 0.05f);
+    ImGui::DragFloat3("Direction", (float*)&world.camera.direction, 0.005f);
+    fixCamera(world.camera);
 
     ImGui::Text(" ");
     ImGui::Text("Sky Parameters");
+    ImGui::DragFloat3("Sun Direction", (float*)&world.sky.sunDirection, 0.005f);
+    normalize(world.sky.sunDirection);
     ImGui::SliderFloat("Sun Int", &world.sky.sunIntensity, 0.0f, 100.0f);
     ImGui::SliderFloat("Sun Exp", &world.sky.sunExponent, 1.0f, 150.0f);
     ImGui::SliderFloat("Hor Exp", &world.sky.horizonExponent, 0.0f, 1.0f);
