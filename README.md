@@ -1,3 +1,3 @@
 # Path Tracing Renderer
 
-<img width="2880" height="1800" alt="Demo Three" src="https://github.com/user-attachments/assets/3f2c1a5f-0c74-46b5-ae52-dc877680cdd9" />
+<img width="2880" height="1800" alt="Demo 4 5" src="https://github.com/user-attachments/assets/a331ed92-0eab-4479-9020-cb65c2001b84" />
