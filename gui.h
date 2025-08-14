@@ -107,17 +107,17 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
             world.spheres.hostPointer[indexSphere].isSelected = false;
 
         ImGui::Text(" ");
-        ImGui::SliderFloat("Radius", &world.spheres.hostPointer[indexSphere].radius, 0.1f, 20.0f);
+        ImGui::DragFloat("Radius", &world.spheres.hostPointer[indexSphere].radius, 0.05f);
         ImGui::DragFloat3("Position", (float*)&world.spheres.hostPointer[indexSphere].position, 0.05f);
         
         ImGui::Text(" ");
-        ImGui::SliderFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.0f, 1.0f);
+        ImGui::DragFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.05f, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", (float*)&world.spheres.hostPointer[indexSphere].color);
 
         ImGui::Text(" ");
         if (ImGui::Button("Toggle Light Source"))
             world.spheres.hostPointer[indexSphere].isLightSource = !world.spheres.hostPointer[indexSphere].isLightSource;
-        ImGui::SliderFloat("Intensity", &world.spheres.hostPointer[indexSphere].lightIntensity, 0.0f, 35.0f);
+        ImGui::DragFloat("Intensity", &world.spheres.hostPointer[indexSphere].lightIntensity, 0.05f, 0.0f, 35.0f);
 
         ImGui::Text(" ");
         if (ImGui::Button("Delete"))
@@ -148,13 +148,13 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
         ImGui::DragFloat3("Size", (float*)&world.boxes.hostPointer[indexBox].size, 0.05f);
 
         ImGui::Text(" ");
-        ImGui::SliderFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.0f, 1.0f);
+        ImGui::DragFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.05f, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", (float*)&world.boxes.hostPointer[indexBox].color);
 
         ImGui::Text(" ");
         if (ImGui::Button("Toggle Light Source"))
             world.boxes.hostPointer[indexBox].isLightSource = !world.boxes.hostPointer[indexBox].isLightSource;
-        ImGui::SliderFloat("Intensity", &world.boxes.hostPointer[indexBox].lightIntensity, 0.0f, 35.0f);
+        ImGui::DragFloat("Intensity", &world.boxes.hostPointer[indexBox].lightIntensity, 0.05f, 0.0f, 35.0f);
 
         ImGui::Text(" ");
         if (ImGui::Button("Delete"))
@@ -163,7 +163,7 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
         if (ImGui::Button("Duplicate"))
         {
             Box newBox = world.boxes.hostPointer[indexBox];
-            newBox.position.y += newBox.size.y * 2.0f;
+            newBox.position.y += newBox.size.y * 2.4f;
             newBox.isSelected = true;
             world.boxes.hostPointer[indexBox].isSelected = false;
             world.boxes.add(newBox);

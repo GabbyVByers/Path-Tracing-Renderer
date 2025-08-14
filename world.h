@@ -58,7 +58,7 @@ struct GlobalUtilities
     Vec3* accumulatedFrameBuffer;
     unsigned int* deviceHashArray = nullptr;
     float antiAliasing = 0.001f;
-    int maxBounceLimit = 50;
+    int maxBounceLimit = 3;
 };
 
 struct World
