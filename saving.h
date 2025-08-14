@@ -9,6 +9,8 @@ struct MetaData
 	int sizeBytes = -1;
 	int numSpheres = -1;
 	int numBoxes = -1;
+
+	Camera camera;
 };
 
 inline void saveSpheres(World& world, char fileName[24])
@@ -21,6 +23,7 @@ inline void saveSpheres(World& world, char fileName[24])
 	meta.sizeBytes = sizeBytes;
 	meta.numSpheres = numSpheres;
 	meta.numBoxes = numBoxes;
+	meta.camera = world.camera;
 
 	char* buffer = new char[sizeBytes];
 	Sphere* spheres = world.spheres.hostPointer;
@@ -54,6 +57,7 @@ inline void loadSpheres(World& world, char fileName[24])
 
 	MetaData meta;
 	inFile.read((char*)&meta, sizeof(MetaData));
+	world.camera = meta.camera;
 
 	char* buffer = new char[meta.sizeBytes];
 	inFile.seekg(0, std::ios::beg);
