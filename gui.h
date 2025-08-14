@@ -27,7 +27,7 @@ inline void drawImgui(bool& enableGUI, GLFWwindow* window, World& world, char fi
     {
         glfwSwapBuffers(window);
         glfwPollEvents();
-        std::cout << "Accumulated Frames: " << world.global.numAccumulatedFrames << "\n";
+        std::cout << "Rays: " << world.global.numAccumulatedFrames << "\n";
         return;
     }
 
