@@ -115,7 +115,7 @@ inline void drawImgui(bool& enableGUI, GLFWwindow* window, World& world, char fi
         ImGui::DragFloat("Radius", &world.spheres.hostPointer[indexSphere].radius, 0.05f);
         
         ImGui::Text(" ");
-        ImGui::DragFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.0005f, 0.0f, 1.0f);
+        ImGui::DragFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.005f, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", (float*)&world.spheres.hostPointer[indexSphere].color);
 
         ImGui::Text(" ");
@@ -152,7 +152,7 @@ inline void drawImgui(bool& enableGUI, GLFWwindow* window, World& world, char fi
         ImGui::DragFloat3("Size", (float*)&world.boxes.hostPointer[indexBox].size, 0.05f);
 
         ImGui::Text(" ");
-        ImGui::DragFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.0005f, 0.0f, 1.0f);
+        ImGui::DragFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.005f, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", (float*)&world.boxes.hostPointer[indexBox].color);
 
         ImGui::Text(" ");
