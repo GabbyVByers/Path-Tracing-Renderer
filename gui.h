@@ -111,13 +111,13 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
         ImGui::DragFloat3("Position", (float*)&world.spheres.hostPointer[indexSphere].position, 0.05f);
         
         ImGui::Text(" ");
-        ImGui::DragFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Roughness", &world.spheres.hostPointer[indexSphere].roughness, 0.0005f, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", (float*)&world.spheres.hostPointer[indexSphere].color);
 
         ImGui::Text(" ");
         if (ImGui::Button("Toggle Light Source"))
             world.spheres.hostPointer[indexSphere].isLightSource = !world.spheres.hostPointer[indexSphere].isLightSource;
-        ImGui::DragFloat("Intensity", &world.spheres.hostPointer[indexSphere].lightIntensity, 0.05f, 0.0f, 35.0f);
+        ImGui::DragFloat("Intensity", &world.spheres.hostPointer[indexSphere].lightIntensity, 0.005f, 0.0f, 35.0f);
 
         ImGui::Text(" ");
         if (ImGui::Button("Delete"))
@@ -148,13 +148,13 @@ inline void drawImgui(bool& enableGUI, World& world, char fileName[24], int fps)
         ImGui::DragFloat3("Size", (float*)&world.boxes.hostPointer[indexBox].size, 0.05f);
 
         ImGui::Text(" ");
-        ImGui::DragFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.05f, 0.0f, 1.0f);
+        ImGui::DragFloat("Roughness", &world.boxes.hostPointer[indexBox].roughness, 0.0005f, 0.0f, 1.0f);
         ImGui::ColorEdit3("Color", (float*)&world.boxes.hostPointer[indexBox].color);
 
         ImGui::Text(" ");
         if (ImGui::Button("Toggle Light Source"))
             world.boxes.hostPointer[indexBox].isLightSource = !world.boxes.hostPointer[indexBox].isLightSource;
-        ImGui::DragFloat("Intensity", &world.boxes.hostPointer[indexBox].lightIntensity, 0.05f, 0.0f, 35.0f);
+        ImGui::DragFloat("Intensity", &world.boxes.hostPointer[indexBox].lightIntensity, 0.005f, 0.0f, 35.0f);
 
         ImGui::Text(" ");
         if (ImGui::Button("Delete"))
