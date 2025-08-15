@@ -7,7 +7,7 @@
 	A utility for managing an array of elements between the Host and Device
 	The Host is responsible for adding or removing elements from the array.
 	The Device need only concern herself with reading or writing data to the existing array.
-	Call the appropriate update function if you modify the element with the pointer returned by accessing.
+	Call the appropriate update function if the host or device updates either of their respective arrays.
 */
 
 template<typename type>
