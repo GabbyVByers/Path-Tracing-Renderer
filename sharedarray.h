@@ -10,7 +10,6 @@
 	A utility for managing an array of elements between the Host and Device
 	The Host is responsible for adding or removing elements from the array.
 	The Device need only concern herself with reading or writing data to the existing array.
-	Accessing an element with operator "example_array[index]" returns a pointer to that element.
 	Call the appropriate update function if you modify the element with the pointer returned by accessing.
 */
 
