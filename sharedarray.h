@@ -3,9 +3,6 @@
 #include "cuda_runtime.h"
 #include "iostream"
 
-#define HOST 0
-#define DEVICE 1
-
 /*
 	A utility for managing an array of elements between the Host and Device
 	The Host is responsible for adding or removing elements from the array.
